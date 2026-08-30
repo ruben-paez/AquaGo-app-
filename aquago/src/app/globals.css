@@ -1,0 +1,87 @@
+@import "tailwindcss";
+
+@theme {
+  --color-paper: #f2f8fc;
+  --color-ink: #0d2b3a;
+  --color-ink-soft: #47616f;
+
+  /* Paleta tomada del logotipo AQUAnat */
+  --color-water-50: #eff8fd;
+  --color-water-100: #d8eefb;
+  --color-water-200: #b0dcf5;
+  --color-water-300: #7cc4ec;
+  --color-water-400: #45a8de;
+  --color-water-500: #1f8dc9;
+  --color-water-600: #1272a8;
+  --color-water-700: #105c88;
+  --color-water-800: #124d70;
+  --color-water-900: #12405d;
+  --color-water-950: #0a2839;
+
+  --color-steel: #6e828e;
+
+  --color-ok: #1d8a56;
+  --color-ok-soft: #e2f4ea;
+  --color-warn: #b45309;
+  --color-warn-soft: #fdf1dc;
+  --color-danger: #c24444;
+  --color-danger-soft: #fbe9e9;
+
+  --shadow-card: 0 1px 2px rgba(13, 37, 48, 0.05), 0 8px 24px -12px rgba(13, 37, 48, 0.18);
+  --shadow-pop: 0 2px 6px rgba(13, 37, 48, 0.08), 0 16px 40px -16px rgba(13, 37, 48, 0.3);
+}
+
+@theme inline {
+  --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sora), ui-sans-serif, system-ui, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+  }
+  ::selection {
+    background: var(--color-water-200);
+  }
+}
+
+.leaflet-container {
+  z-index: 0;
+  font-family: inherit;
+}
+.leaflet-container:focus {
+  outline: none;
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.35;
+    transform: scale(0.75);
+  }
+}
+.animate-pulse-dot {
+  animation: pulse-dot 1.3s ease-in-out infinite;
+}
+
+@keyframes ride {
+  0% {
+    top: 4%;
+  }
+  50% {
+    top: 62%;
+  }
+  100% {
+    top: 4%;
+  }
+}
+.animate-ride {
+  animation: ride 5s ease-in-out infinite;
+}
