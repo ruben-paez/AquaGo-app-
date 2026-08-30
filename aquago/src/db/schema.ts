@@ -104,14 +104,18 @@ export const drivers = pgTable(
     /** última posición conocida */
     lat: doublePrecision("lat"),
     lng: doublePrecision("lng"),
+    /** cuándo llegó la última posición (para saber qué tan fresca está) */
+    lastSeenAt: timestamp("last_seen_at"),
     /** cuántos pedidos puede llevar a la vez */
     capacity: integer("capacity").notNull().default(4),
     /** zona preferida (opcional, sirve de desempate) */
     preferredZone: text("preferred_zone").notNull().default(""),
     active: boolean("active").notNull().default(true),
+    /** usuario vinculado (login del repartidor). Único: 1 usuario = 1 repartidor */
+    userId: integer("user_id"),
     createdAt: timestamp("created_at").notNull().defaultNow(),
   },
-  (t) => [index("drivers_brand_idx").on(t.brandId)]
+  (t) => [index("drivers_brand_idx").on(t.brandId), uniqueIndex("drivers_user_unique").on(t.userId)]
 );
 
 export const products = pgTable(

@@ -1,0 +1,29 @@
+AQUAGO · ACTUALIZACIÓN "VENDEDORES + MAPAS EN TIEMPO REAL"
+==========================================================
+
+ARCHIVOS INCLUIDOS (20) — están en la carpeta "aquago" de este zip.
+Subilos así en GitHub:
+
+1. Entrá al repo → Add file → Upload files
+2. Arrastrá LA CARPETA "aquago" COMPLETA desde adentro del zip
+   (GitHub reemplaza los archivos que coinciden y conserva los demás;
+   además crea las carpetas nuevas: repartidor/, driver/, brand/…)
+3. Commit changes
+4. Esperá el redeploy de Vercel (~1-2 min)
+5. IMPORTANTÍSIMO: en Neon, corré el archivo migracion-vendedores.sql
+   (SQL Editor → pegar → Run). Sin ese paso la app tira error porque
+   las columnas nuevas no existen.
+
+QUÉ SE AGREGA
+-------------
+• /repartidor — panel del vendedor: mapa con pines numerados, ruta
+  óptima, botones "Salí hacia el cliente" / "Entregado", GPS compartido.
+• /admin pestaña "En vivo" — la marca ve en el mapa dónde está cada
+  vendedor y qué pedidos lleva (actualiza solo cada 10 s).
+• "Mis pedidos" del cliente — mapa en vivo con el vendedor y ETA cuando
+  el pedido va en camino.
+• Los vendedores entran con usuario y contraseña (el login los lleva
+  directo a su panel). La marca les crea el acceso desde
+  Admin → Reparto → "🔑 Crear usuario de acceso" en cada tarjeta.
+• Cuentas demo: repartidor@aquago.com.py / repartidor123
+                repartidor2@aquago.com.py / repartidor123

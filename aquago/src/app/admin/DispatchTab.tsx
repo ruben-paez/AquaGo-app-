@@ -464,6 +464,8 @@ export default function DispatchTab() {
                     </a>
                   )}
                 </div>
+
+                <AccessForm driverId={d.id} />
               </div>
             );
           })}
@@ -510,6 +512,89 @@ function Kpi({ label, value, accent = "text-ink" }: { label: string; value: stri
     <div className="rounded-xl border border-ink/10 bg-white p-4 shadow-card">
       <p className="text-[11px] font-bold uppercase tracking-wider text-ink-soft">{label}</p>
       <p className={`mt-1 font-display text-xl font-bold ${accent}`}>{value}</p>
+    </div>
+  );
+}
+
+/**
+ * Alta de acceso del repartidor: crea su usuario/contraseña para que entre
+ * al panel de entregas (/repartidor). Lo usa la marca al contratar a alguien.
+ */
+function AccessForm({ driverId }: { driverId: number }) {
+  const [open, setOpen] = useState(false);
+  const [email, setEmail] = useState("");
+  const [pass, setPass] = useState("");
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit() {
+    setBusy(true);
+    setMsg("");
+    try {
+      const res = await fetch(`/api/admin/drivers/${driverId}/access`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password: pass }),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        setMsg("✓ Acceso creado — pasale el email y la contraseña al repartidor.");
+        setEmail("");
+        setPass("");
+      } else {
+        setMsg(d.error ?? "No se pudo crear el acceso.");
+      }
+    } catch {
+      setMsg("Sin conexión.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  if (!open) {
+    return (
+      <button
+        onClick={() => setOpen(true)}
+        className="mt-2.5 text-[11px] font-bold text-water-700 hover:underline"
+      >
+        🔑 Crear usuario de acceso para este repartidor
+      </button>
+    );
+  }
+
+  return (
+    <div className="mt-2.5 rounded-lg bg-paper p-2.5">
+      <p className="text-[11px] font-bold text-ink-soft">
+        Acceso del repartidor (entrará a &laquo;Repartidor&raquo; en el menú)
+      </p>
+      <div className="mt-1.5 flex flex-wrap gap-1.5">
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="email@del-repartidor.com"
+          className="min-w-0 flex-1 rounded-md border border-ink/15 bg-white px-2 py-1 text-xs outline-none focus:border-water-500"
+        />
+        <input
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
+          placeholder="contraseña"
+          className="w-28 rounded-md border border-ink/15 bg-white px-2 py-1 text-xs outline-none focus:border-water-500"
+        />
+        <button
+          onClick={submit}
+          disabled={busy || !email || !pass}
+          className="rounded-md bg-water-700 px-2.5 py-1 text-xs font-bold text-white transition hover:bg-water-800 disabled:opacity-50"
+        >
+          {busy ? "…" : "Crear"}
+        </button>
+        <button
+          onClick={() => setOpen(false)}
+          className="rounded-md border border-ink/15 bg-white px-2 py-1 text-xs font-bold text-ink-soft"
+        >
+          ✕
+        </button>
+      </div>
+      {msg && <p className="mt-1.5 text-[11px] font-semibold text-ink-soft">{msg}</p>}
     </div>
   );
 }

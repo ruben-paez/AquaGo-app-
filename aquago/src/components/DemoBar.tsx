@@ -16,6 +16,7 @@ interface Me {
 
 const ROLES = [
   { key: "cliente", label: "Cliente", to: "/pedir" },
+  { key: "repartidor", label: "Repartidor", to: "/repartidor" },
   { key: "plataforma", label: "Plataforma", to: "/admin" },
   { key: "marca", label: "Marca", to: "/admin" },
 ];

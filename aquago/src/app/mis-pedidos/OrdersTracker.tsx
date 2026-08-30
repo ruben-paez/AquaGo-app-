@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import MapPicker from "@/components/MapPicker";
+import TrackLive from "@/components/TrackLive";
 import StatusBadge from "@/components/StatusBadge";
 import { dateShort, formatGs, timeShort } from "@/lib/format";
 import type { OrderView } from "@/lib/queries";
@@ -189,6 +190,11 @@ function OrderCard({
             </span>
           )}
         </div>
+      )}
+
+      {/* Mapa en vivo: dónde va el repartidor */}
+      {live && order.driverId != null && (order.status === "en_camino" || order.status === "aceptada") && (
+        <TrackLive orderId={order.id} token={token} />
       )}
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">

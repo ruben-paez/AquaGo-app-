@@ -31,7 +31,14 @@ export default function LoginForm() {
       // la pantalla de "creá tu cuenta" aunque el login haya sido correcto.
       // gotoWithSession además arrastra el token si la cookie no sobrevivió.
       if (data.token) setStoredToken(data.token);
-      await gotoWithSession(data.user.isAdmin ? "/admin" : "/pedir", data.token);
+      // Cada rol entra a su panel: repartidor → sus entregas, staff → admin.
+      const dest =
+        data.user.role === "repartidor"
+          ? "/repartidor"
+          : data.user.isAdmin
+            ? "/admin"
+            : "/pedir";
+      await gotoWithSession(dest, data.token);
     } catch {
       setError("No pudimos conectar. Probá de nuevo.");
       setLoading(false);
@@ -119,6 +126,12 @@ export default function LoginForm() {
                 pass: "marca123",
                 label: "Marca AQUAnat",
                 desc: "Pedidos y catálogo del local",
+              },
+              {
+                email: "repartidor@aquago.com.py",
+                pass: "repartidor123",
+                label: "Repartidor",
+                desc: "Entregas, ruta y GPS en vivo",
               },
             ].map((c) => (
               <button

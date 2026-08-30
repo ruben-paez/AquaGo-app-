@@ -16,6 +16,7 @@ import { AquaNatMark } from "@/components/Brand";
 import BillingTab from "./BillingTab";
 import AnalyticsTab from "./AnalyticsTab";
 import DispatchTab from "./DispatchTab";
+import LiveTab from "./LiveTab";
 import ProofReview from "./ProofReview";
 
 interface AdminProduct {
@@ -33,7 +34,7 @@ export default function AdminPanel() {
   const [orders, setOrders] = useState<OrderView[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [brands, setBrands] = useState<BrandView[]>([]);
-  const [tab, setTab] = useState<"pedidos" | "reparto" | "productos" | "comisiones" | "datos">("pedidos");
+  const [tab, setTab] = useState<"pedidos" | "reparto" | "envivo" | "productos" | "comisiones" | "datos">("pedidos");
   const [filter, setFilter] = useState<string>("todos");
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<string>("");
@@ -164,6 +165,7 @@ export default function AdminPanel() {
           [
             ["pedidos", "Pedidos"],
             ["reparto", "Reparto"],
+            ["envivo", "En vivo"],
             ["productos", "Catálogo"],
             ["comisiones", "Comisiones"],
             ["datos", "Datos"],
@@ -182,6 +184,7 @@ export default function AdminPanel() {
       </div>
 
       {tab === "reparto" && <DispatchTab />}
+      {tab === "envivo" && <LiveTab />}
       {tab === "comisiones" && <BillingTab />}
       {tab === "datos" && <AnalyticsTab brands={brands} />}
 

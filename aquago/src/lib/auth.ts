@@ -1,7 +1,7 @@
 import { cookies, headers } from "next/headers";
 import { and, eq, gt } from "drizzle-orm";
 import { db } from "@/db";
-import { sessions, users } from "@/db/schema";
+import { drivers, sessions, users } from "@/db/schema";
 import { hashPassword, verifyPassword, randomToken } from "./password";
 
 export { hashPassword, verifyPassword, randomToken };
@@ -50,6 +50,10 @@ export interface PublicUser {
   lng: number | null;
   deliveryNotes: string;
   isAdmin: boolean;
+  /** cliente | marca | plataforma | repartidor */
+  role: string;
+  /** si role = marca, a qué marca pertenece */
+  brandId: number | null;
   createdAt: string;
 }
 
@@ -63,6 +67,8 @@ export function toPublicUser(u: {
   lng: number | null;
   deliveryNotes: string;
   isAdmin: boolean;
+  role: string;
+  brandId: number | null;
   createdAt: Date;
 }): PublicUser {
   return {
@@ -75,8 +81,23 @@ export function toPublicUser(u: {
     lng: u.lng,
     deliveryNotes: u.deliveryNotes,
     isAdmin: u.isAdmin,
+    role: u.role,
+    brandId: u.brandId,
     createdAt: u.createdAt.toISOString(),
   };
+}
+
+/**
+ * Fila de repartidor vinculada al usuario logueado (role = repartidor).
+ * Devuelve null si el usuario no tiene perfil de repartidor.
+ */
+export async function getDriverForUser(userId: number) {
+  const rows = await db
+    .select()
+    .from(drivers)
+    .where(eq(drivers.userId, userId))
+    .limit(1);
+  return rows[0] ?? null;
 }
 
 /**

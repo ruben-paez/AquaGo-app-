@@ -18,6 +18,7 @@ import { createSession, SESSION_COOKIE, sessionCookieOptions, toPublicUser } fro
  */
 const DEMO_ACCOUNTS: Record<string, string> = {
   cliente: "cliente@demo.com.py",
+  repartidor: "repartidor@aquago.com.py",
   plataforma: "admin@aquago.com.py",
   marca: "marca@aquanat.com.py",
 };
