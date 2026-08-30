@@ -1,0 +1,27 @@
+AQUAGO · ACTUALIZACIÓN "GESTIÓN DE MARCAS Y VENDEDORES" (plataforma)
+=====================================================================
+
+ARCHIVOS: 8 (carpeta "aquago" dentro del zip)
+→ NO requiere correr SQL en Neon esta vez (no hay cambios de base de datos)
+
+INSTALACIÓN
+-----------
+1. GitHub → Add file → Upload files → arrastrá LA CARPETA "aquago" COMPLETA
+   (reemplaza los modificados y crea BrandsTab + la carpeta brands/ de api)
+2. Commit → Vercel redespliega solo (~1-2 min)
+3. Entrá a tu panel como PLATAFORMA → nueva pestaña "Marcas"
+
+QUÉ INCLUYE
+-----------
+• Pestaña "Marcas" (solo visible para tu usuario de plataforma):
+  - Crear marcas nuevas (nombre, ciudad, eslogan, comisión, costo de
+    servicio, ETA, base en el mapa)
+  - Editar datos comerciales y pausar/activar una marca
+  - Dentro de cada marca: lista de vendedores
+    · Agregar vendedor (nombre, teléfono, vehículo, placa, capacidad, zona)
+    · Editar vendedores existentes
+    · 🔑 Crear acceso (email + contraseña) o resetear la contraseña
+    · Activar/desactivar (el inactivo no recibe pedidos)
+• Seguridad: cada marca solo puede gestionar sus PROPIOS vendedores;
+  crear/editar marcas es exclusivo de la plataforma.
+• La marca ve sus vendedores igual que antes (Reparto), pero sin tocar ajenos.
