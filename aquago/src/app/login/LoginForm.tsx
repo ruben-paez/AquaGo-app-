@@ -9,6 +9,7 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [demoMode, setDemoMode] = useState(false);
   const [loading, setLoading] = useState(false);
 
   async function doLogin(mail: string, pass: string) {
@@ -104,6 +105,8 @@ export default function LoginForm() {
         </form>
 
         <div className="mt-5 border-t border-dashed border-ink/15 pt-4">
+          {demoMode && (
+          <>
           <p className="text-center text-xs font-bold uppercase tracking-wider text-ink-soft">
             Entrar con un clic
           </p>
@@ -155,6 +158,8 @@ export default function LoginForm() {
           <p className="mt-3 text-center text-[11px] text-ink-soft">
             También podés escribirlas a mano en el formulario de arriba.
           </p>
+          </>
+          )}
         </div>
       </div>
 

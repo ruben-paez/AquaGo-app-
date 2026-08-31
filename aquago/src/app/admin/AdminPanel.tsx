@@ -17,6 +17,7 @@ import BillingTab from "./BillingTab";
 import AnalyticsTab from "./AnalyticsTab";
 import DispatchTab from "./DispatchTab";
 import LiveTab from "./LiveTab";
+import BrandsTab from "./BrandsTab";
 import ProofReview from "./ProofReview";
 
 interface AdminProduct {
@@ -30,11 +31,11 @@ interface AdminProduct {
   active: boolean;
 }
 
-export default function AdminPanel() {
+export default function AdminPanel({ userRole = "plataforma" }: { userRole?: string }) {
   const [orders, setOrders] = useState<OrderView[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [brands, setBrands] = useState<BrandView[]>([]);
-  const [tab, setTab] = useState<"pedidos" | "reparto" | "envivo" | "productos" | "comisiones" | "datos">("pedidos");
+  const [tab, setTab] = useState<"pedidos" | "reparto" | "envivo" | "marcas" | "productos" | "comisiones" | "datos">("pedidos");
   const [filter, setFilter] = useState<string>("todos");
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<string>("");
@@ -136,11 +137,14 @@ export default function AdminPanel() {
             Pedidos en vivo y catálogo. Se actualiza cada 10 segundos.
           </p>
         </div>
-        {updatedAt && (
-          <span className="text-xs font-semibold text-ink-soft">
-            Actualizado {new Date(updatedAt).toLocaleTimeString("es-CL")}
-          </span>
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <PasswordButton />
+          {updatedAt && (
+            <span className="text-xs font-semibold text-ink-soft">
+              Actualizado {new Date(updatedAt).toLocaleTimeString("es-CL")}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* KPIs */}
@@ -160,12 +164,13 @@ export default function AdminPanel() {
       </div>
 
       {/* Tabs */}
-      <div className="mt-6 flex gap-2">
+      <div className="mt-6 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
         {(
           [
             ["pedidos", "Pedidos"],
             ["reparto", "Reparto"],
             ["envivo", "En vivo"],
+            ...(userRole === "plataforma" ? ([["marcas", "Marcas"]] as const) : []),
             ["productos", "Catálogo"],
             ["comisiones", "Comisiones"],
             ["datos", "Datos"],
@@ -185,6 +190,7 @@ export default function AdminPanel() {
 
       {tab === "reparto" && <DispatchTab />}
       {tab === "envivo" && <LiveTab />}
+      {tab === "marcas" && <BrandsTab />}
       {tab === "comisiones" && <BillingTab />}
       {tab === "datos" && <AnalyticsTab brands={brands} />}
 
@@ -524,5 +530,111 @@ function ProductsTab({
         Al ocultar un producto deja de aparecer en la app del cliente, pero los pedidos ya creados conservan su precio.
       </p>
     </section>
+  );
+}
+
+/**
+ * Cambio de contraseña de la propia cuenta logueada. Lo usa sobre todo el
+ * admin de plataforma para rotar su clave tras recibir el acceso temporal.
+ */
+function PasswordButton() {
+  const [open, setOpen] = useState(false);
+  const [currentPassword, setCurrent] = useState("");
+  const [newPassword, setNext] = useState("");
+  const [repeat, setRepeat] = useState("");
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit() {
+    if (newPassword !== repeat) {
+      setMsg("Las contraseñas nuevas no coinciden.");
+      return;
+    }
+    setBusy(true);
+    setMsg("");
+    try {
+      const res = await fetch("/api/auth/change-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ currentPassword, newPassword }),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        setMsg("✓ Contraseña actualizada");
+        setCurrent("");
+        setNext("");
+        setRepeat("");
+        setTimeout(() => {
+          setOpen(false);
+          setMsg("");
+        }, 1500);
+      } else {
+        setMsg(d.error ?? "No se pudo cambiar.");
+      }
+    } catch {
+      setMsg("Sin conexión.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <>
+      <button
+        onClick={() => setOpen((v) => !v)}
+        className="rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-xs font-bold text-ink-soft transition hover:border-water-400"
+      >
+        🔑 Mi contraseña
+      </button>
+      {open && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl">
+            <h3 className="font-display text-lg font-bold">Cambiar mi contraseña</h3>
+            <div className="mt-4 space-y-2">
+              <input
+                type="password"
+                value={currentPassword}
+                onChange={(e) => setCurrent(e.target.value)}
+                placeholder="Contraseña actual"
+                className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2.5 text-sm outline-none focus:border-water-500"
+              />
+              <input
+                type="password"
+                value={newPassword}
+                onChange={(e) => setNext(e.target.value)}
+                placeholder="Contraseña nueva (mín. 8, letras y números)"
+                className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2.5 text-sm outline-none focus:border-water-500"
+              />
+              <input
+                type="password"
+                value={repeat}
+                onChange={(e) => setRepeat(e.target.value)}
+                placeholder="Repetir contraseña nueva"
+                className="w-full rounded-lg border border-ink/15 bg-paper px-3 py-2.5 text-sm outline-none focus:border-water-500"
+              />
+            </div>
+            {msg && <p className="mt-2 text-xs font-semibold text-ink-soft">{msg}</p>}
+            <div className="mt-4 flex justify-end gap-2">
+              <button
+                onClick={() => {
+                  setOpen(false);
+                  setMsg("");
+                }}
+                className="rounded-xl border border-ink/15 px-4 py-2 text-sm font-bold text-ink-soft"
+              >
+                Cerrar
+              </button>
+              <button
+                onClick={submit}
+                disabled={busy || !currentPassword || newPassword.length < 8}
+                className="rounded-xl bg-water-700 px-4 py-2 font-display text-sm font-bold text-white transition hover:bg-water-800 disabled:opacity-50"
+              >
+                {busy ? "…" : "Guardar"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }

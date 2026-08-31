@@ -17,9 +17,6 @@ export default async function Nav() {
           <Link href="/#marcas" className="rounded-lg px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-water-100 hover:text-ink">
             Marcas
           </Link>
-          <Link href="/negocio" className="rounded-lg px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-water-100 hover:text-ink">
-            Negocio
-          </Link>
           {user && (
             <Link href="/mis-pedidos" className="rounded-lg px-3 py-2 text-sm font-semibold text-ink-soft transition hover:bg-water-100 hover:text-ink">
               Mis pedidos
@@ -67,6 +64,31 @@ export default async function Nav() {
           )}
         </div>
       </div>
+
+      {/* Navegación móvil: visible solo bajo md, compensa el menú oculto */}
+      <nav className="flex items-center justify-center gap-1 border-t border-ink/5 px-2 pb-1.5 pt-1 md:hidden">
+        <Link href="/" className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-soft transition hover:bg-water-100 hover:text-ink">
+          Inicio
+        </Link>
+        <Link href="/pedir" className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-soft transition hover:bg-water-100 hover:text-ink">
+          Pedir
+        </Link>
+        {user && (
+          <Link href="/mis-pedidos" className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-soft transition hover:bg-water-100 hover:text-ink">
+            Mis pedidos
+          </Link>
+        )}
+        {user?.isAdmin && (
+          <Link href="/admin" className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-soft transition hover:bg-water-100 hover:text-ink">
+            Panel
+          </Link>
+        )}
+        {user?.role === "repartidor" && (
+          <Link href="/repartidor" className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-soft transition hover:bg-water-100 hover:text-ink">
+            Entregas
+          </Link>
+        )}
+      </nav>
     </header>
   );
 }

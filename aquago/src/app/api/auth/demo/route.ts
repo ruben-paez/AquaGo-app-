@@ -24,6 +24,16 @@ const DEMO_ACCOUNTS: Record<string, string> = {
 };
 
 export async function POST(req: Request) {
+  // Modo demo apagado (producción): los accesos de un clic quedan desactivados
+  // y cada usuario entra con SU email y contraseña. Para reactivarlos para
+  // pruebas, definí DEMO_MODE=on en las variables de entorno de Vercel.
+  if (process.env.DEMO_MODE !== "on") {
+    return NextResponse.json(
+      { error: "El acceso de demostración está deshabilitado." },
+      { status: 403 }
+    );
+  }
+
   const body = await req.json().catch(() => ({}));
   const role = String(body?.role ?? "cliente");
   const email = DEMO_ACCOUNTS[role];

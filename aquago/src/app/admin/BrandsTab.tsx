@@ -24,6 +24,7 @@ interface BrandAdmin {
   baseLat: number | null;
   baseLng: number | null;
   driverCount: number;
+  accessEmail: string | null;
 }
 
 interface VendorUser {
@@ -142,6 +143,7 @@ export default function BrandsTab() {
 
             {isOpen && (
               <div className="space-y-4 border-t border-ink/10 p-4">
+                <BrandAccessForm brand={b} onSaved={load} />
                 <BrandEditForm brand={b} onSaved={load} />
                 <div className="border-t border-dashed border-ink/15 pt-3">
                   <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">
@@ -228,6 +230,71 @@ function NewBrandForm({ onCreated }: { onCreated: (b: { id: number }) => void })
         </button>
         {msg && <p className="text-xs font-semibold text-danger">{msg}</p>}
       </div>
+    </div>
+  );
+}
+
+/* ─────────────── Acceso de la marca (usuario + contraseña) ─────────────── */
+
+function BrandAccessForm({ brand, onSaved }: { brand: BrandAdmin; onSaved: () => void }) {
+  const [email, setEmail] = useState(brand.accessEmail ?? "");
+  const [pass, setPass] = useState("");
+  const [msg, setMsg] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function save() {
+    setBusy(true);
+    setMsg("");
+    try {
+      const res = await fetch(`/api/admin/brands/${brand.id}/access`, {
+        method: "POST",
+        headers: sessionHeaders({ "Content-Type": "application/json" }),
+        body: JSON.stringify({ email, password: pass }),
+      });
+      const d = await res.json();
+      if (res.ok) {
+        setMsg(d.message ?? "✓ Listo");
+        setPass("");
+        onSaved();
+      } else {
+        setMsg(d.error ?? "No se pudo guardar.");
+      }
+    } catch {
+      setMsg("Sin conexión.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  const valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && (brand.accessEmail ? true : pass.length >= 6);
+
+  return (
+    <div className="rounded-xl border border-water-200 bg-water-50/60 p-3">
+      <p className="text-xs font-bold uppercase tracking-wider text-ink-soft">
+        🔑 Acceso de la marca al panel {brand.accessEmail && <span className="text-teal-700">· actual: {brand.accessEmail}</span>}
+      </p>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        <input
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="email@de-la-marca.com"
+          className="min-w-0 flex-1 rounded-md border border-ink/15 bg-white px-2 py-1.5 text-xs outline-none focus:border-water-500"
+        />
+        <input
+          value={pass}
+          onChange={(e) => setPass(e.target.value)}
+          placeholder={brand.accessEmail ? "nueva contraseña" : "contraseña"}
+          className="w-36 rounded-md border border-ink/15 bg-white px-2 py-1.5 text-xs outline-none focus:border-water-500"
+        />
+        <button
+          onClick={save}
+          disabled={busy || !valid}
+          className="rounded-md bg-water-700 px-3 py-1.5 text-xs font-bold text-white transition hover:bg-water-800 disabled:opacity-50"
+        >
+          {busy ? "…" : brand.accessEmail ? "Actualizar" : "Crear acceso"}
+        </button>
+      </div>
+      {msg && <p className="mt-1.5 text-[11px] font-semibold text-ink-soft">{msg}</p>}
     </div>
   );
 }

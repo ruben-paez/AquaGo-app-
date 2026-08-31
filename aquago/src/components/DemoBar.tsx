@@ -29,8 +29,14 @@ const ROLES = [
 export default function DemoBar() {
   const [me, setMe] = useState<Me | null>(null);
   const [loading, setLoading] = useState<string | null>(null);
+  const [demoOn, setDemoOn] = useState(false);
 
   useEffect(() => {
+    // La barra de demos solo aparece si DEMO_MODE=on (producción va sin ella).
+    fetch("/api/health")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => setDemoOn(Boolean(d?.demoMode)))
+      .catch(() => setDemoOn(false));
     const token = getStoredToken();
     fetch("/api/me", {
       cache: "no-store",
@@ -78,6 +84,8 @@ export default function DemoBar() {
     clearStoredToken();
     window.location.assign("/");
   }
+
+  if (!demoOn) return null;
 
   return (
     <div className="border-b border-water-800 bg-water-950 px-4 py-2 text-white">
