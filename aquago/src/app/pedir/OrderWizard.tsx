@@ -241,6 +241,9 @@ export default function OrderWizard({
     setStep(1);
   }
 
+  // Diálogo "¿Seguro que querés cancelar el pedido?"
+  const [confirmCancel, setConfirmCancel] = useState(false);
+
   const inputCls =
     "w-full rounded-lg border border-ink/15 bg-paper px-3.5 py-2.5 text-sm outline-none transition focus:border-water-500 focus:ring-2 focus:ring-water-200";
 
@@ -367,6 +370,11 @@ export default function OrderWizard({
         {/* PASO 2: PRODUCTOS */}
         {step === 2 && (
           <div>
+            <NavRowFlow
+              onBack={() => setStep(1)}
+              onCancel={() => setConfirmCancel(true)}
+              backLabel="Cambiar marca"
+            />
             {products === null && !loadError && (
               <div className="space-y-3 py-2">
                 {[0, 1, 2].map((i) => (
@@ -500,7 +508,13 @@ export default function OrderWizard({
                 onClick={() => setStep(2)}
                 className="rounded-xl border border-ink/15 bg-white px-4 py-3 text-sm font-bold text-ink-soft transition hover:border-water-400"
               >
-                Volver
+                ← Volver
+              </button>
+              <button
+                onClick={() => setConfirmCancel(true)}
+                className="rounded-xl border border-danger/30 px-4 py-3 text-sm font-bold text-danger transition hover:bg-danger-soft"
+              >
+                Cancelar pedido
               </button>
               <button
                 onClick={() => {
@@ -724,15 +738,23 @@ export default function OrderWizard({
                 onClick={() => setStep(3)}
                 className="rounded-xl border border-ink/15 bg-white px-4 py-3 text-sm font-bold text-ink-soft transition hover:border-water-400"
               >
-                Volver
+                ← Volver
               </button>
-              <button
-                onClick={confirmOrder}
-                disabled={placing}
-                className="flex items-center gap-2 rounded-xl bg-ok px-5 py-3 font-display text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-50"
-              >
-                {placing ? "Confirmando…" : `Confirmar · ${formatGs(total)}`}
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setConfirmCancel(true)}
+                  className="rounded-xl border border-danger/30 px-4 py-3 text-sm font-bold text-danger transition hover:bg-danger-soft"
+                >
+                  Cancelar pedido
+                </button>
+                <button
+                  onClick={confirmOrder}
+                  disabled={placing}
+                  className="flex items-center gap-2 rounded-xl bg-ok px-5 py-3 font-display text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-50"
+                >
+                  {placing ? "Confirmando…" : `Confirmar · ${formatGs(total)}`}
+                </button>
+              </div>
             </div>
           </div>
         )}
@@ -798,9 +820,72 @@ export default function OrderWizard({
         )}
       </div>
 
+      {/* Diálogo: cancelar pedido antes de confirmar */}
+      {confirmCancel && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-ink/50 p-4">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 text-center shadow-xl">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-danger-soft text-danger">
+              ✕
+            </span>
+            <h3 className="mt-3 font-display text-lg font-bold">¿Cancelar este pedido?</h3>
+            <p className="mt-1 text-sm text-ink-soft">
+              Se vacía el carrito y volvés al inicio. Todavía no se cobró nada.
+            </p>
+            <div className="mt-5 flex justify-center gap-2">
+              <button
+                onClick={() => setConfirmCancel(false)}
+                className="rounded-xl bg-water-700 px-5 py-2.5 font-display text-sm font-bold text-white transition hover:bg-water-800"
+              >
+                No, seguir pidiendo
+              </button>
+              <button
+                onClick={() => {
+                  setConfirmCancel(false);
+                  reset();
+                }}
+                className="rounded-xl border border-danger/40 px-5 py-2.5 font-display text-sm font-bold text-danger transition hover:bg-danger-soft"
+              >
+                Sí, cancelar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <p className="mt-4 text-center text-xs text-ink-soft">
         Entrega estimada 30–60 min · Zona: Encarnación y alrededores
       </p>
+    </div>
+  );
+}
+
+/**
+ * Fila superior de navegación del flujo: botón de atrás + cancelar pedido.
+ * Se muestra antes de confirmar; una vez confirmado, el pedido ya vale.
+ */
+function NavRowFlow({
+  onBack,
+  onCancel,
+  backLabel = "← Volver",
+}: {
+  onBack: () => void;
+  onCancel: () => void;
+  backLabel?: string;
+}) {
+  return (
+    <div className="mb-3 flex items-center justify-between gap-2">
+      <button
+        onClick={onBack}
+        className="rounded-xl border border-ink/15 bg-white px-3.5 py-2 text-sm font-bold text-ink-soft transition hover:border-water-400"
+      >
+        {backLabel}
+      </button>
+      <button
+        onClick={onCancel}
+        className="text-sm font-bold text-danger transition hover:underline"
+      >
+        ✕ Cancelar pedido
+      </button>
     </div>
   );
 }

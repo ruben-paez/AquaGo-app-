@@ -310,3 +310,21 @@ export const sessions = pgTable(
     index("sessions_user_idx").on(t.userId),
   ]
 );
+
+/**
+ * Mensajes del chat entre cliente y vendedor asignado, en el contexto de un
+ * pedido. Se borran junto con el pedido si algún día se agrega cascade.
+ */
+export const orderMessages = pgTable(
+  "order_messages",
+  {
+    id: serial("id").primaryKey(),
+    orderId: integer("order_id").notNull(),
+    /** cliente | repartidor | marca | plataforma */
+    senderRole: text("sender_role").notNull(),
+    senderName: text("sender_name").notNull(),
+    body: text("body").notNull(),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [index("order_messages_order_idx").on(t.orderId, t.createdAt)]
+);

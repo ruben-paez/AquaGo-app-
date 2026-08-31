@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { formatGs, timeAgo } from "@/lib/format";
 import { sessionHeaders } from "@/lib/session-client";
 import type { LiveMapProps } from "@/components/LiveMap";
+import ChatBox from "@/components/ChatBox";
 
 const LiveMap = dynamic(() => import("@/components/LiveMap"), {
   ssr: false,
@@ -56,6 +57,7 @@ export default function DriverPanel() {
   const [gpsOn, setGpsOn] = useState(false);
   const [gpsMsg, setGpsMsg] = useState("");
   const [tick, setTick] = useState(0);
+  const [chatFor, setChatFor] = useState<number | null>(null);
   const lastSent = useRef(0);
   const watchId = useRef<number | null>(null);
 
@@ -221,6 +223,19 @@ export default function DriverPanel() {
         </div>
       </div>
 
+      {/* acciones rápidas */}
+      <div className="flex flex-wrap gap-2">
+        <a
+          href="/repartidor/cierre"
+          className="flex-1 rounded-2xl border border-ink/10 bg-white p-4 text-center font-display text-sm font-bold text-water-800 shadow-card transition hover:border-water-400"
+        >
+          🧾 Cerrar venta diaria
+          <span className="mt-0.5 block text-[11px] font-normal text-ink-soft">
+            Resumen del día en PDF
+          </span>
+        </a>
+      </div>
+
       {/* GPS */}
       <div className="flex flex-wrap items-center gap-3 rounded-2xl border border-ink/10 bg-white p-4">
         <button
@@ -343,7 +358,18 @@ export default function DriverPanel() {
                             🧭 Ir con Google Maps
                           </a>
                         )}
+                        <button
+                          onClick={() => setChatFor(chatFor === o.id ? null : o.id)}
+                          className="rounded-xl border border-ink/15 px-4 py-2 font-display text-sm font-bold text-water-700 transition hover:bg-water-50"
+                        >
+                          💬 {chatFor === o.id ? "Cerrar chat" : "Chat con el cliente"}
+                        </button>
                       </div>
+                      {chatFor === o.id && (
+                        <div className="mt-3">
+                          <ChatBox orderId={o.id} compact />
+                        </div>
+                      )}
                     </div>
                   </div>
                 </article>

@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import MapPicker from "@/components/MapPicker";
 import TrackLive from "@/components/TrackLive";
+import ChatBox from "@/components/ChatBox";
 import StatusBadge from "@/components/StatusBadge";
 import { dateShort, formatGs, timeShort } from "@/lib/format";
 import type { OrderView } from "@/lib/queries";
@@ -84,6 +85,9 @@ export default function OrdersTracker({
 
       {active.length > 0 && (
         <section className="mt-6 space-y-4">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-ink-soft">
+            ⏳ Pendientes ({active.length})
+          </h2>
           {active.map((o) => (
             <OrderCard key={o.id} order={o} live token={sessionToken} />
           ))}
@@ -92,7 +96,9 @@ export default function OrdersTracker({
 
       {history.length > 0 && (
         <section className="mt-8">
-          <h2 className="text-xs font-bold uppercase tracking-wider text-ink-soft">Historial</h2>
+          <h2 className="text-xs font-bold uppercase tracking-wider text-ink-soft">
+            ✅ Realizados ({history.length})
+          </h2>
           <div className="mt-3 space-y-3">
             {history.map((o) => (
               <OrderCard key={o.id} order={o} token={sessionToken} />
@@ -116,6 +122,7 @@ function OrderCard({
   const stepIdx = STEP_INDEX[order.status] ?? 0;
   const cancelled = order.status === "cancelada";
   const hasMap = order.lat != null && order.lng != null;
+  const [chatOpen, setChatOpen] = useState(false);
 
   return (
     <article className={`rounded-2xl border bg-white p-5 shadow-card ${live ? "border-water-300" : "border-ink/10"}`}>
@@ -195,6 +202,23 @@ function OrderCard({
       {/* Mapa en vivo: dónde va el repartidor */}
       {live && order.driverId != null && (order.status === "en_camino" || order.status === "aceptada") && (
         <TrackLive orderId={order.id} token={token} />
+      )}
+
+      {/* Chat con el vendedor asignado */}
+      {live && order.driverId != null && (order.status === "aceptada" || order.status === "en_camino") && (
+        <div className="mt-3">
+          <button
+            onClick={() => setChatOpen((v) => !v)}
+            className="w-full rounded-xl border border-ink/15 bg-white px-4 py-2.5 font-display text-sm font-bold text-water-700 transition hover:bg-water-50"
+          >
+            💬 {chatOpen ? "Cerrar conversación" : "Conversar con el vendedor"}
+          </button>
+          {chatOpen && (
+            <div className="mt-2">
+              <ChatBox orderId={order.id} token={token} compact />
+            </div>
+          )}
+        </div>
       )}
 
       <div className="mt-4 grid gap-4 sm:grid-cols-2">
