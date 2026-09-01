@@ -98,6 +98,12 @@ export default function LeafletMap({
             }
             maxZoom={19}
           />
+          {satellite && (
+            <TileLayer
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}"
+              maxZoom={19}
+            />
+          )}
           {hasCenter && <Marker position={center} icon={pinIcon} />}
           {onChange && <ClickHandler onPick={onChange} />}
         </MapContainer>

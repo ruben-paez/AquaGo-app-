@@ -89,6 +89,12 @@ export default function LiveMap({ markers, path = [], heightClass = "h-80", zoom
           }
           maxZoom={19}
         />
+        {satellite && (
+          <TileLayer
+            url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}"
+            maxZoom={19}
+          />
+        )}
         {path.length > 1 && (
           <Polyline positions={path} pathOptions={{ color: "#1d4ed8", weight: 4, opacity: 0.65, dashArray: "8 8" }} />
         )}

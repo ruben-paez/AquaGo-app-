@@ -66,6 +66,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <PushSetup />
         <DemoBar />
         {children}
+        <footer className="border-t border-ink/10 bg-white py-6 text-center">
+          <p className="text-xs font-semibold text-ink-soft">
+            © {new Date().getFullYear()} <span className="font-display font-bold text-water-800">AquaGo Company</span> · Todos los derechos reservados
+          </p>
+        </footer>
       </body>
     </html>
   );

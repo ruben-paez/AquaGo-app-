@@ -3,7 +3,7 @@
 import dynamic from "next/dynamic";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { formatGs, timeAgo } from "@/lib/format";
-import { sessionHeaders } from "@/lib/session-client";
+import { sessionHeaders, clearStoredToken } from "@/lib/session-client";
 import type { LiveMapProps } from "@/components/LiveMap";
 import ChatBox from "@/components/ChatBox";
 
@@ -58,6 +58,8 @@ export default function DriverPanel() {
   const [gpsMsg, setGpsMsg] = useState("");
   const [tick, setTick] = useState(0);
   const [chatFor, setChatFor] = useState<number | null>(null);
+  const [streetPath, setStreetPath] = useState<[number, number][] | null>(null);
+  const [streetInfo, setStreetInfo] = useState<{ km: number; min: number } | null>(null);
   const lastSent = useRef(0);
   const watchId = useRef<number | null>(null);
 
@@ -203,6 +205,41 @@ export default function DriverPanel() {
     .filter((p): p is [number, number] => p !== null);
   if (driver.lat != null && driver.lng != null) path.unshift([driver.lat, driver.lng]);
 
+  // Ruta por calles reales: OSRM (Open Source Routing Machine) traza la
+  // línea siguiendo los caminos, no en diagonal. Si no responde, se usan
+  // las líneas rectas de siempre (por eso el fallback).
+  const pathKey = path.map((p) => p.join(",")).join(";");
+  useEffect(() => {
+    setStreetPath(null);
+    setStreetInfo(null);
+    if (path.length < 2) return;
+    const coords = path.map(([lat, lng]) => `${lng},${lat}`).join(";");
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 7000);
+    fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`, {
+      signal: ctrl.signal,
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("osrm"))))
+      .then((d) => {
+        const geo = d?.routes?.[0]?.geometry?.coordinates;
+        if (Array.isArray(geo) && geo.length > 1) {
+          setStreetPath(geo.map((c: [number, number]) => [c[1], c[0]] as [number, number]));
+          setStreetInfo({
+            km: Math.round((d.routes[0].distance / 1000) * 10) / 10,
+            min: Math.max(1, Math.round(d.routes[0].duration / 60)),
+          });
+        }
+      })
+      .catch(() => {
+        // sin ruta por calles: queda la recta
+      });
+    return () => {
+      clearTimeout(timer);
+      ctrl.abort();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathKey]);
+
   return (
     <div className="space-y-4">
       {/* encabezado */}
@@ -214,6 +251,30 @@ export default function DriverPanel() {
           </p>
         </div>
         <div className="flex items-center gap-2">
+          <a
+            href="/repartidor/cierre"
+            className="rounded-xl border border-ink/15 bg-white px-3 py-2 text-xs font-bold text-ink-soft transition hover:border-water-400"
+          >
+            🧾 Cierre
+          </a>
+          <button
+            onClick={async () => {
+              if (gpsOn && watchId.current !== null) {
+                navigator.geolocation.clearWatch(watchId.current);
+                watchId.current = null;
+              }
+              try {
+                await fetch("/api/auth/logout", { method: "POST", headers: sessionHeaders() });
+              } catch {
+                // cerramos igual
+              }
+              clearStoredToken();
+              window.location.assign("/");
+            }}
+            className="rounded-xl bg-water-950 px-3.5 py-2 text-xs font-bold text-white transition hover:bg-water-900"
+          >
+            🛑 Terminar jornada y salir
+          </button>
           <span className="rounded-full bg-teal-50 px-3 py-1 text-xs font-bold text-teal-700 ring-1 ring-teal-200">
             {orders.length} en curso
           </span>
@@ -261,10 +322,12 @@ export default function DriverPanel() {
         <div className="rounded-2xl border border-ink/10 bg-white p-3">
           <div className="flex flex-wrap items-center justify-between gap-2 px-1 pb-2">
             <h2 className="font-display text-sm font-bold uppercase tracking-wide text-ink-soft">
-              Ruta sugerida · {totalKm} km · ~{totalMin} min
+              {streetInfo
+                ? `Ruta por calles · ${streetInfo.km} km · ~${streetInfo.min} min`
+                : `Ruta sugerida · ${totalKm} km · ~${totalMin} min`}
             </h2>
           </div>
-          <LiveMap markers={markers} path={path} heightClass="h-80" />
+          <LiveMap markers={markers} path={streetPath ?? path} heightClass="h-80" />
           <p className="mt-2 px-1 text-xs text-ink-soft">
             La ruta va del punto más cercano al siguiente: seguí los números 1, 2, 3…
           </p>
