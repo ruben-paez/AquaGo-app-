@@ -3,7 +3,7 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { ENCARNACION_CENTER } from "@/lib/format";
 import { IconLocate } from "./icons";
 
@@ -39,6 +39,7 @@ export default function LeafletMap({
   zoom = 14,
 }: LeafletMapProps) {
   const mapRef = useRef<L.Map | null>(null);
+  const [satellite, setSatellite] = useState(false);
   const hasCenter = center !== null;
 
   // El icono se crea dentro del componente: así Leaflet nunca se evalúa en el servidor.
@@ -88,17 +89,37 @@ export default function LeafletMap({
           scrollWheelZoom
           attributionControl={false}
         >
-          <TileLayer url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png" />
+          <TileLayer
+            key={satellite ? "sat" : "mapa"}
+            url={
+              satellite
+                ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+                : "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+            }
+            maxZoom={19}
+          />
           {hasCenter && <Marker position={center} icon={pinIcon} />}
           {onChange && <ClickHandler onPick={onChange} />}
         </MapContainer>
+      </div>
+
+      <button
+        type="button"
+        onClick={() => setSatellite((v) => !v)}
+        className="absolute right-3 top-3 z-[600] rounded-lg bg-white/95 px-2.5 py-1.5 text-[11px] font-bold text-ink shadow-pop ring-1 ring-ink/10 transition hover:bg-white"
+      >
+        {satellite ? "🗺️ Mapa" : "🛰️ Satélite"}
+      </button>
+
+      <div className="pointer-events-none absolute bottom-1.5 right-2 z-[500] rounded bg-white/80 px-1.5 text-[9px] text-ink-soft">
+        {satellite ? "Imágenes © Esri, Maxar" : "© OpenStreetMap"}
       </div>
 
       {showLocate && (
         <button
           type="button"
           onClick={handleLocate}
-          className="absolute right-3 top-3 z-[500] flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-water-700 shadow-pop transition hover:bg-water-50"
+          className="absolute right-3 top-12 z-[500] flex items-center gap-1.5 rounded-lg bg-white px-3 py-1.5 text-xs font-semibold text-water-700 shadow-pop transition hover:bg-water-50"
         >
           <IconLocate className="h-3.5 w-3.5" />
           Mi ubicación

@@ -3,7 +3,7 @@
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
 import { MapContainer, TileLayer, Marker, Polyline, Popup, useMap } from "react-leaflet";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { ENCARNACION_CENTER } from "@/lib/format";
 
 export type MarkerKind = "driver" | "store" | "stop" | "dest";
@@ -65,6 +65,7 @@ function FitAll({ points }: { points: [number, number][] }) {
 }
 
 export default function LiveMap({ markers, path = [], heightClass = "h-80", zoom = 14 }: LiveMapProps) {
+  const [satellite, setSatellite] = useState(false);
   const valid = markers.filter((m) => Number.isFinite(m.lat) && Number.isFinite(m.lng));
   const center = useMemo<[number, number]>(
     () => (valid[0] ? [valid[0].lat, valid[0].lng] : ENCARNACION_CENTER),
@@ -80,8 +81,13 @@ export default function LiveMap({ markers, path = [], heightClass = "h-80", zoom
     <div className={`relative overflow-hidden rounded-xl border border-ink/10 ${heightClass}`}>
       <MapContainer center={center} zoom={zoom} scrollWheelZoom={false} className="h-full w-full">
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          key={satellite ? "sat" : "mapa"}
+          url={
+            satellite
+              ? "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+              : "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+          }
+          maxZoom={19}
         />
         {path.length > 1 && (
           <Polyline positions={path} pathOptions={{ color: "#1d4ed8", weight: 4, opacity: 0.65, dashArray: "8 8" }} />
@@ -93,6 +99,15 @@ export default function LiveMap({ markers, path = [], heightClass = "h-80", zoom
         ))}
         <FitAll points={points} />
       </MapContainer>
+      <button
+        onClick={() => setSatellite((v) => !v)}
+        className="absolute right-2.5 top-2.5 z-[600] rounded-lg bg-white/95 px-2.5 py-1.5 text-[11px] font-bold text-ink shadow ring-1 ring-ink/10 transition hover:bg-white"
+      >
+        {satellite ? "🗺️ Mapa" : "🛰️ Satélite"}
+      </button>
+      <div className="pointer-events-none absolute bottom-1.5 right-2 z-[500] rounded bg-white/80 px-1.5 text-[9px] text-ink-soft">
+        {satellite ? "Imágenes © Esri, Maxar" : "© OpenStreetMap"}
+      </div>
     </div>
   );
 }

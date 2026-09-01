@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { and, asc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { drivers, orderMessages, orders } from "@/db/schema";
+import { sendPushToUser } from "@/lib/push";
 import { getSessionUser } from "@/lib/auth";
 
 export interface ChatAccess {
@@ -113,6 +114,38 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
       body: text,
     })
     .returning();
+
+  // Aviso push a la otra parte (si hay a quién avisar y el navegador
+  // tiene permiso). Nunca bloquea la respuesta del chat.
+  try {
+    const [fresh] = await db.select().from(orders).where(eq(orders.id, orderId)).limit(1);
+    if (fresh?.driverId) {
+      if (access.chatRole === "cliente") {
+        const dRows = await db
+          .select({ userId: drivers.userId })
+          .from(drivers)
+          .where(eq(drivers.id, fresh.driverId))
+          .limit(1);
+        if (dRows[0]?.userId) {
+          await sendPushToUser(dRows[0].userId, {
+            title: `💬 ${user.name} · pedido ${fresh.code}`,
+            body: text.slice(0, 120),
+            url: "/repartidor",
+            tag: `chat-${orderId}`,
+          });
+        }
+      } else if (access.chatRole === "repartidor") {
+        await sendPushToUser(fresh.userId, {
+          title: `💬 ${user.name} · tu pedido ${fresh.code}`,
+          body: text.slice(0, 120),
+          url: "/mis-pedidos",
+          tag: `chat-${orderId}`,
+        });
+      }
+    }
+  } catch {
+    // el chat ya salió; el push es opcional
+  }
 
   return NextResponse.json({
     message: {

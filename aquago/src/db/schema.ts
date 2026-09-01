@@ -339,3 +339,21 @@ export const appSettings = pgTable("app_settings", {
   value: text("value").notNull().default(""),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
+
+/**
+ * Suscripciones a notificaciones push (Web Push / VAPID).
+ * Un usuario puede tener varias: celu, compu, etc.
+ */
+export const pushSubscriptions = pgTable(
+  "push_subscriptions",
+  {
+    id: serial("id").primaryKey(),
+    userId: integer("user_id").notNull(),
+    endpoint: text("endpoint").notNull(),
+    p256dh: text("p256dh").notNull(),
+    auth: text("auth").notNull(),
+    userAgent: text("user_agent").notNull().default(""),
+    createdAt: timestamp("created_at").notNull().defaultNow(),
+  },
+  (t) => [uniqueIndex("push_endpoint_unique").on(t.endpoint), index("push_user_idx").on(t.userId)]
+);

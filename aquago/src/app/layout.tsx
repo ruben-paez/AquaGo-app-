@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Manrope, Sora } from "next/font/google";
 import SessionBridge from "@/components/SessionBridge";
+import PushSetup from "@/components/PushSetup";
 import DemoBar from "@/components/DemoBar";
 import { getSessionToken } from "@/lib/auth";
 import "./globals.css";
@@ -62,6 +63,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body className="min-h-dvh">
         <SessionBridge />
+      <PushSetup />
         <DemoBar />
         {children}
       </body>
