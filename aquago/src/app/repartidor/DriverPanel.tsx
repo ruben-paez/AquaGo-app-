@@ -159,6 +159,53 @@ export default function DriverPanel() {
     }
   }
 
+  // Ruta por calles reales: OSRM traza la línea siguiendo los caminos,
+  // no en diagonal. Si no responde, queda la línea recta de siempre.
+  const pathKeyRef = useRef("");
+  useEffect(() => {
+    if (!data) return;
+    const d = data.driver;
+    const pts: [number, number][] = [];
+    if (d.lat != null && d.lng != null) pts.push([d.lat, d.lng]);
+    for (const r of data.route) {
+      const o = data.orders.find((x) => x.id === r.orderId);
+      if (o?.lat != null && o?.lng != null) pts.push([o.lat, o.lng]);
+    }
+    if (pts.length < 2) {
+      setStreetPath(null);
+      setStreetInfo(null);
+      return;
+    }
+    const key = pts.map((p) => p.join(",")).join(";");
+    if (key === pathKeyRef.current) return; // nada cambió: no re-consultar
+    pathKeyRef.current = key;
+
+    const coords = pts.map(([lat, lng]) => `${lng},${lat}`).join(";");
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 7000);
+    fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`, {
+      signal: ctrl.signal,
+    })
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("osrm"))))
+      .then((out) => {
+        const geo = out?.routes?.[0]?.geometry?.coordinates;
+        if (Array.isArray(geo) && geo.length > 1) {
+          setStreetPath(geo.map((c: [number, number]) => [c[1], c[0]] as [number, number]));
+          setStreetInfo({
+            km: Math.round((out.routes[0].distance / 1000) * 10) / 10,
+            min: Math.max(1, Math.round(out.routes[0].duration / 60)),
+          });
+        }
+      })
+      .catch(() => {
+        // sin ruta por calles: queda la recta
+      });
+    return () => {
+      clearTimeout(timer);
+      ctrl.abort();
+    };
+  }, [data]);
+
   if (error && !data) {
     return (
       <div className="rounded-2xl border border-dashed border-ink/20 bg-white p-10 text-center">
@@ -204,41 +251,6 @@ export default function DriverPanel() {
     })
     .filter((p): p is [number, number] => p !== null);
   if (driver.lat != null && driver.lng != null) path.unshift([driver.lat, driver.lng]);
-
-  // Ruta por calles reales: OSRM (Open Source Routing Machine) traza la
-  // línea siguiendo los caminos, no en diagonal. Si no responde, se usan
-  // las líneas rectas de siempre (por eso el fallback).
-  const pathKey = path.map((p) => p.join(",")).join(";");
-  useEffect(() => {
-    setStreetPath(null);
-    setStreetInfo(null);
-    if (path.length < 2) return;
-    const coords = path.map(([lat, lng]) => `${lng},${lat}`).join(";");
-    const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 7000);
-    fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`, {
-      signal: ctrl.signal,
-    })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error("osrm"))))
-      .then((d) => {
-        const geo = d?.routes?.[0]?.geometry?.coordinates;
-        if (Array.isArray(geo) && geo.length > 1) {
-          setStreetPath(geo.map((c: [number, number]) => [c[1], c[0]] as [number, number]));
-          setStreetInfo({
-            km: Math.round((d.routes[0].distance / 1000) * 10) / 10,
-            min: Math.max(1, Math.round(d.routes[0].duration / 60)),
-          });
-        }
-      })
-      .catch(() => {
-        // sin ruta por calles: queda la recta
-      });
-    return () => {
-      clearTimeout(timer);
-      ctrl.abort();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathKey]);
 
   return (
     <div className="space-y-4">
