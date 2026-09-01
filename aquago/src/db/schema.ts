@@ -328,3 +328,14 @@ export const orderMessages = pgTable(
   },
   (t) => [index("order_messages_order_idx").on(t.orderId, t.createdAt)]
 );
+
+/**
+ * Configuración editable por el admin de plataforma (clave → valor).
+ * Acá viven los datos de transferencia que ve el cliente al pagar,
+ * sin tener que tocar código.
+ */
+export const appSettings = pgTable("app_settings", {
+  key: text("key").primaryKey(),
+  value: text("value").notNull().default(""),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});

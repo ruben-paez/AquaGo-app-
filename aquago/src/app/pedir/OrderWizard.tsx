@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import MapPicker from "@/components/MapPicker";
+import TransferInfo from "@/components/TransferInfo";
 import Stepper from "@/components/Stepper";
 import StatusBadge from "@/components/StatusBadge";
 import { AquaNatLogo, AquaNatMark } from "@/components/Brand";
@@ -593,20 +594,7 @@ export default function OrderWizard({
               </div>
             ) : (
               <div className="mt-4 rounded-xl border border-ink/10 bg-paper p-4">
-                <div className="grid gap-2 text-sm sm:grid-cols-3">
-                  <div>
-                    <p className="text-xs font-bold text-ink-soft">Banco</p>
-                    <p className="font-bold">Banco Continental</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-ink-soft">Cuenta</p>
-                    <p className="font-bold tabular-nums">17-4175826</p>
-                  </div>
-                  <div>
-                    <p className="text-xs font-bold text-ink-soft">RUC</p>
-                    <p className="font-bold tabular-nums">80012345-6 · AQUAnat</p>
-                  </div>
-                </div>
+                <TransferInfo />
                 <div className="mt-4 rounded-xl border-2 border-dashed border-water-300 bg-white p-3.5">
                   <p className="text-sm font-bold">
                     Subí el comprobante de transferencia

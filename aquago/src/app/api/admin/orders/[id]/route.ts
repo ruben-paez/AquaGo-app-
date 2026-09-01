@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { orders } from "@/db/schema";
 import { getSessionUser } from "@/lib/auth";
 import { ORDER_STATUSES } from "@/lib/format";
+import { syncDriverStatus } from "@/lib/dispatch";
 
 export async function PATCH(
   req: Request,
@@ -49,6 +50,17 @@ export async function PATCH(
   if (updated.length === 0) {
     return NextResponse.json({ error: "Pedido no encontrado." }, { status: 404 });
   }
+
+  // Si el pedido se canceló o entregó, el vendedor queda libre para el
+  // motor de reparto (recalcula disponible/ocupado según su carga real).
+  if (patch.status && updated[0].driverId) {
+    try {
+      await syncDriverStatus(updated[0].driverId);
+    } catch {
+      // nunca bloquea la operación del admin
+    }
+  }
+
 
   return NextResponse.json({
     order: {
