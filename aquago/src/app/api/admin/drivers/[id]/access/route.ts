@@ -54,9 +54,31 @@ export async function POST(req: Request, ctx: { params: Promise<{ id: string }> 
         { status: 400 }
       );
     }
-    // Reenlazamos el repartidor existente a este driver (traslado de marca).
+    // Reenlazamos el repartidor existente a este driver (traslado de marca)
+    // y, si mandaron contraseña, la actualizamos (reset).
+    const patch: Record<string, unknown> = {};
+    if (password) {
+      if (password.length < 6) {
+        return NextResponse.json(
+          { error: "La contraseña debe tener al menos 6 caracteres." },
+          { status: 400 }
+        );
+      }
+      patch.passwordHash = hashPassword(password);
+    }
+    if (Object.keys(patch).length) {
+      await db.update(users).set(patch).where(eq(users.id, eu.id));
+    }
     await db.update(drivers).set({ userId: eu.id }).where(eq(drivers.id, driverId));
-    return NextResponse.json({ ok: true, userId: eu.id, linked: true });
+    return NextResponse.json({
+      ok: true,
+      userId: eu.id,
+      linked: true,
+      passwordReset: Boolean(password),
+      message: password
+        ? "Contraseña actualizada para ese email."
+        : "Cuenta existente vinculada a este vendedor.",
+    });
   }
 
   // Si el driver ya tenía otro usuario, lo desvinculamos (1 usuario = 1 driver).

@@ -10,6 +10,9 @@ export async function GET() {
   if (!user.isAdmin) {
     return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
   }
-  const ordersList = await getAllOrders();
+  // La marca solo ve los pedidos de SU marca.
+  const ordersList = await getAllOrders(
+    user.role === "marca" ? user.brandId ?? -1 : undefined
+  );
   return NextResponse.json({ orders: ordersList });
 }

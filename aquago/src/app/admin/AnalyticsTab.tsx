@@ -371,11 +371,6 @@ export default function AnalyticsTab({ brands }: { brands: BrandView[] }) {
         </div>
       </div>
 
-      <p className="rounded-xl bg-water-50 p-4 text-xs leading-relaxed text-ink-soft">
-        <strong className="text-ink">Este es el activo del que hablabas:</strong> ninguna aguatería sola
-        puede ver esto. AquaGo sabe quién compra, cada cuánto, en qué barrio, a qué hora y con qué medio de
-        pago — y puede accionar sobre eso antes que nadie.
-      </p>
     </section>
   );
 }

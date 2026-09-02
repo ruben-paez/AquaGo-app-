@@ -361,8 +361,12 @@ export interface BillingPayload {
   };
 }
 
-export async function getBilling(): Promise<BillingPayload> {
-  const brandRows = await db.select().from(brands).orderBy(brands.sortOrder);
+export async function getBilling(brandId?: number): Promise<BillingPayload> {
+  const brandRows = await db
+    .select()
+    .from(brands)
+    .where(brandId !== undefined ? eq(brands.id, brandId) : undefined)
+    .orderBy(brands.sortOrder);
 
   const pendingRows = await db
     .select({
@@ -372,7 +376,7 @@ export async function getBilling(): Promise<BillingPayload> {
       count: sql<number>`count(*)::int`,
     })
     .from(commissions)
-    .where(eq(commissions.status, "pendiente"))
+    .where(and(eq(commissions.status, "pendiente"), brandId !== undefined ? eq(commissions.brandId, brandId) : undefined))
     .groupBy(commissions.brandId);
 
   const pendingByBrand = new Map(pendingRows.map((r) => [r.brandId, r]));
@@ -398,6 +402,7 @@ export async function getBilling(): Promise<BillingPayload> {
     })
     .from(settlements)
     .leftJoin(brands, eq(brands.id, settlements.brandId))
+    .where(brandId !== undefined ? eq(settlements.brandId, brandId) : undefined)
     .orderBy(sql`${settlements.createdAt} desc`)
     .limit(40);
 

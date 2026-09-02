@@ -3,12 +3,14 @@ import { eq } from "drizzle-orm";
 import { db } from "@/db";
 import { brands } from "@/db/schema";
 import { getSessionUser } from "@/lib/auth";
-import { getPlan, PLANS, roundToCashStep } from "@/lib/pricing";
 
+/** Edición de marca existente. Solo plataforma. */
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
   const user = await getSessionUser();
   if (!user) return NextResponse.json({ error: "No autenticado." }, { status: 401 });
-  if (!user.isAdmin) return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
+  if (user.role !== "plataforma") {
+    return NextResponse.json({ error: "Solo la plataforma gestiona marcas." }, { status: 403 });
+  }
 
   const { id } = await ctx.params;
   const brandId = Number(id);
@@ -20,43 +22,47 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   if (!body) return NextResponse.json({ error: "Petición inválida." }, { status: 400 });
 
   const patch: Record<string, unknown> = {};
-
-  // Cambiar de plan reescribe comisión, abono y costo de servicio
-  if (typeof body.plan === "string" && PLANS.some((p) => p.key === body.plan)) {
-    const plan = getPlan(body.plan);
-    patch.plan = plan.key;
-    patch.commissionBps = plan.commissionBps;
-    patch.monthlyFee = plan.monthlyFee;
-    patch.serviceFeeBps = plan.serviceFeeBps;
-    patch.serviceFeeMin = plan.serviceFeeMin;
-  }
-  // Override manual (negociación puntual con la marca)
-  if (Number.isInteger(Number(body.commissionBps))) {
-    const bps = Number(body.commissionBps);
-    if (bps >= 0 && bps <= 3000) patch.commissionBps = bps;
-  }
-  if (Number.isInteger(Number(body.serviceFeeBps))) {
-    const bps = Number(body.serviceFeeBps);
-    if (bps >= 0 && bps <= 3000) patch.serviceFeeBps = bps;
-  }
-  if (Number.isInteger(Number(body.serviceFeeMin))) {
-    const min = Number(body.serviceFeeMin);
-    if (min >= 0 && min <= 20000) patch.serviceFeeMin = roundToCashStep(min);
-  }
-  if (typeof body.billingCycle === "string" && ["semanal", "quincenal", "mensual"].includes(body.billingCycle)) {
-    patch.billingCycle = body.billingCycle;
-  }
-  if (typeof body.autoRetention === "boolean") patch.autoRetention = body.autoRetention;
-  if (typeof body.billingStatus === "string" && ["al_dia", "por_vencer", "suspendida"].includes(body.billingStatus)) {
-    patch.billingStatus = body.billingStatus;
-  }
+  if (typeof body.name === "string" && body.name.trim().length >= 3) patch.name = body.name.trim();
+  if (typeof body.tagline === "string") patch.tagline = body.tagline.trim();
+  if (typeof body.city === "string" && body.city.trim()) patch.city = body.city.trim();
+  if (typeof body.description === "string") patch.description = body.description.trim();
+  if (typeof body.active === "boolean") patch.active = body.active;
   if (typeof body.comingSoon === "boolean") patch.comingSoon = body.comingSoon;
+  if (typeof body.autoAssign === "boolean") patch.autoAssign = body.autoAssign;
+  if (["cercania", "equilibrado", "equitativo"].includes(body.dispatchMode)) {
+    patch.dispatchMode = body.dispatchMode;
+  }
+  if (Number.isInteger(Number(body.etaMin))) patch.etaMin = Number(body.etaMin);
+  if (Number.isInteger(Number(body.etaMax))) patch.etaMax = Number(body.etaMax);
+  if (Number.isFinite(Number(body.deliveryFee)) && Number(body.deliveryFee) >= 0) {
+    patch.deliveryFee = Math.round(Number(body.deliveryFee));
+  }
+  const pct = (v: unknown) => {
+    const n = Number(v);
+    return Number.isFinite(n) && n >= 0 && n <= 100 ? Math.round(n * 100) : null;
+  };
+  const cb = pct(body.commissionPct);
+  if (cb !== null) patch.commissionBps = cb;
+  const sf = pct(body.serviceFeePct);
+  if (sf !== null) patch.serviceFeeBps = sf;
+  if (Number.isFinite(Number(body.serviceFeeMin)) && Number(body.serviceFeeMin) >= 0) {
+    patch.serviceFeeMin = Math.round(Number(body.serviceFeeMin));
+  }
+  if (Number.isFinite(Number(body.baseLat)) && Number.isFinite(Number(body.baseLng))) {
+    patch.baseLat = Number(body.baseLat);
+    patch.baseLng = Number(body.baseLng);
+  }
 
   if (Object.keys(patch).length === 0) {
     return NextResponse.json({ error: "Nada para actualizar." }, { status: 400 });
   }
 
-  const updated = await db.update(brands).set(patch).where(eq(brands.id, brandId)).returning();
+  const updated = await db
+    .update(brands)
+    .set(patch)
+    .where(eq(brands.id, brandId))
+    .returning();
+
   if (updated.length === 0) {
     return NextResponse.json({ error: "Marca no encontrada." }, { status: 404 });
   }

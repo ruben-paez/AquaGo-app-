@@ -61,7 +61,8 @@ const BILLING_STATUS: Record<string, { label: string; cls: string }> = {
   suspendida: { label: "⛔ Suspendida", cls: "bg-danger-soft text-danger" },
 };
 
-export default function BillingTab() {
+export default function BillingTab({ userRole = "plataforma" }: { userRole?: string }) {
+  const esAdmin = userRole === "plataforma";
   const [data, setData] = useState<BillingData | null>(null);
   const [busy, setBusy] = useState(false);
   const [flash, setFlash] = useState("");
@@ -230,7 +231,8 @@ export default function BillingTab() {
                   />
                 </div>
 
-                <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-dashed border-ink/15 pt-3">
+                {esAdmin && (
+                  <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-dashed border-ink/15 pt-3">
                   <label className="text-xs font-bold text-ink-soft">Plan</label>
                   <select
                     className={selectCls}
@@ -271,6 +273,7 @@ export default function BillingTab() {
                     {formatGs(b.serviceFeeMin)}
                   </span>
                 </div>
+                  )}
               </div>
             );
           })}
@@ -336,6 +339,7 @@ export default function BillingTab() {
                     </td>
                     <td className="p-3 text-right">
                       {s.status !== "pagada" ? (
+                        esAdmin ? (
                         <button
                           onClick={() => pay(s.id)}
                           disabled={busy}
@@ -343,6 +347,9 @@ export default function BillingTab() {
                         >
                           Registrar pago
                         </button>
+                        ) : (
+                          <span className="text-xs font-semibold text-ink-soft">Espera cierre</span>
+                        )
                       ) : (
                         <span className="inline-flex items-center gap-1 text-xs font-bold text-ok">
                           <IconCheck className="h-3.5 w-3.5" /> cobrada

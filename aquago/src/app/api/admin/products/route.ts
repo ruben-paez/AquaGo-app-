@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { asc, desc } from "drizzle-orm";
+import { asc, desc, eq } from "drizzle-orm";
 import { db } from "@/db";
 import { products } from "@/db/schema";
 import { getSessionUser } from "@/lib/auth";
@@ -13,9 +13,11 @@ export async function GET() {
   if (!user.isAdmin) {
     return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
   }
+  // La marca solo ve los productos de SU catálogo.
   const rows = await db
     .select()
     .from(products)
+    .where(user.role === "marca" ? eq(products.brandId, user.brandId ?? -1) : undefined)
     .orderBy(asc(products.sortOrder), asc(products.id));
   return NextResponse.json({ products: rows });
 }
@@ -40,7 +42,9 @@ export async function POST(req: Request) {
   const volume = String(body.volume ?? "").trim();
   const category =
     body.category === "accesorios" || body.category === "otros" ? body.category : "agua";
-  const brandId = Number.isInteger(Number(body.brandId)) ? Number(body.brandId) : 1;
+  // La marca solo puede crear productos en SU catálogo.
+  const brandId =
+    user.role === "marca" ? user.brandId ?? -1 : Number.isInteger(Number(body.brandId)) ? Number(body.brandId) : 1;
 
   if (name.length < 3) {
     return NextResponse.json({ error: "El nombre es obligatorio." }, { status: 400 });

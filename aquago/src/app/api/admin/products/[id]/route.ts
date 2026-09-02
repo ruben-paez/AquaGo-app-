@@ -52,6 +52,21 @@ export async function PATCH(
     return NextResponse.json({ error: "Nada para actualizar." }, { status: 400 });
   }
 
+  // La marca solo puede editar productos de SU catálogo.
+  if (user.role === "marca") {
+    const own = await db
+      .select({ brandId: products.brandId })
+      .from(products)
+      .where(eq(products.id, productId))
+      .limit(1);
+    if (own.length === 0) {
+      return NextResponse.json({ error: "Producto no encontrado." }, { status: 404 });
+    }
+    if (own[0].brandId !== user.brandId) {
+      return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
+    }
+  }
+
   const updated = await db
     .update(products)
     .set(patch)

@@ -19,7 +19,9 @@ export async function GET(req: Request) {
   if (!user.isAdmin) return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
 
   const { searchParams } = new URL(req.url);
-  const brandParam = searchParams.get("brandId");
+  let brandParam = searchParams.get("brandId");
+  // La marca solo ve el despacho de SU marca.
+  if (user.role === "marca") brandParam = String(user.brandId ?? -1);
 
   const brandRows = await db.select().from(brands).where(eq(brands.comingSoon, false));
   const brand =
@@ -120,6 +122,17 @@ export async function POST(req: Request) {
     if (!Number.isInteger(orderId)) {
       return NextResponse.json({ error: "Pedido inválido." }, { status: 400 });
     }
+    // La marca solo asigna pedidos de SU marca.
+    if (user.role === "marca") {
+      const own = await db
+        .select({ brandId: orders.brandId })
+        .from(orders)
+        .where(eq(orders.id, orderId))
+        .limit(1);
+      if (own.length === 0 || own[0].brandId !== user.brandId) {
+        return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
+      }
+    }
     const driverId = Number.isInteger(Number(body.driverId)) ? Number(body.driverId) : undefined;
     const mode = (body.mode as DispatchMode) ?? undefined;
     const result = await assignOrder(orderId, { driverId, mode });
@@ -131,6 +144,9 @@ export async function POST(req: Request) {
     if (!Number.isInteger(brandId)) {
       return NextResponse.json({ error: "Marca inválida." }, { status: 400 });
     }
+    if (user.role === "marca" && brandId !== user.brandId) {
+      return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
+    }
     const brandRows = await db.select().from(brands).where(eq(brands.id, brandId)).limit(1);
     const mode = (body.mode as DispatchMode) ?? (brandRows[0]?.dispatchMode as DispatchMode);
     const results = await autoAssignPending(brandId, mode ?? "equilibrado");
@@ -141,6 +157,9 @@ export async function POST(req: Request) {
     const brandId = Number(body.brandId);
     if (!Number.isInteger(brandId)) {
       return NextResponse.json({ error: "Marca inválida." }, { status: 400 });
+    }
+    if (user.role === "marca" && brandId !== user.brandId) {
+      return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
     }
     const patch: Record<string, unknown> = {};
     if (["cercania", "equilibrado", "equitativo"].includes(body.dispatchMode)) {

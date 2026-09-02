@@ -134,7 +134,9 @@ export default function AdminPanel({ userRole = "plataforma" }: { userRole?: str
     <div>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="font-display text-3xl font-bold tracking-tight">Panel del local</h1>
+          <h1 className="font-display text-3xl font-bold tracking-tight">
+            {userRole === "plataforma" ? "Panel de AquaGo" : "Panel de marcas"}
+          </h1>
           <p className="mt-1 text-sm text-ink-soft">
             Pedidos en vivo y catálogo. Se actualiza cada 10 segundos.
           </p>
@@ -176,7 +178,7 @@ export default function AdminPanel({ userRole = "plataforma" }: { userRole?: str
             ...(userRole === "plataforma" ? ([["marcas", "Marcas"], ["ajustes", "Ajustes"]] as const) : []),
             ["productos", "Catálogo"],
             ["comisiones", "Comisiones"],
-            ["datos", "Datos"],
+            ...(userRole === "plataforma" ? ([["datos", "Datos"]] as const) : []),
           ] as const
         ).map(([k, label]) => (
           <button
@@ -196,7 +198,7 @@ export default function AdminPanel({ userRole = "plataforma" }: { userRole?: str
       {tab === "clientes" && <CustomersTab />}
       {tab === "marcas" && <BrandsTab />}
       {tab === "ajustes" && <SettingsTab />}
-      {tab === "comisiones" && <BillingTab />}
+      {tab === "comisiones" && <BillingTab userRole={userRole} />}
       {tab === "datos" && <AnalyticsTab brands={brands} />}
 
       {tab === "pedidos" ? (
@@ -233,7 +235,7 @@ export default function AdminPanel({ userRole = "plataforma" }: { userRole?: str
           )}
         </section>
       ) : tab === "productos" ? (
-        <ProductsTab products={products} brands={brands} onPatch={(id, patch) => patchProduct(id, patch)} onAdd={async (data) => {
+        <ProductsTab products={products} brands={brands} userRole={userRole} onPatch={(id, patch) => patchProduct(id, patch)} onAdd={async (data) => {
           try {
             await fetch("/api/admin/products", {
               method: "POST",
@@ -406,11 +408,13 @@ function OrderRow({
 function ProductsTab({
   products,
   brands,
+  userRole = "plataforma",
   onPatch,
   onAdd,
 }: {
   products: AdminProduct[];
   brands: BrandView[];
+  userRole?: string;
   onPatch: (id: number, patch: Record<string, unknown>) => void;
   onAdd: (data: {
     name: string;
@@ -461,6 +465,7 @@ function ProductsTab({
       <form onSubmit={add} className="rounded-2xl border border-ink/10 bg-white p-5 shadow-card">
         <h2 className="font-display text-base font-bold">Agregar producto (nueva línea)</h2>
         <div className="mt-3 grid gap-3 md:grid-cols-12">
+          {userRole === "plataforma" && (
           <select
             className={`${inputCls} md:col-span-3`}
             value={brandId || brands.find((b) => !b.comingSoon)?.id || 1}
@@ -474,6 +479,7 @@ function ProductsTab({
                 </option>
               ))}
           </select>
+          )}
           <input className={`${inputCls} md:col-span-3`} placeholder="Nombre · ej. Bidón 10 L" value={name} onChange={(e) => setName(e.target.value)} required />
           <input className={`${inputCls} md:col-span-2`} placeholder="Precio en Gs" value={price} onChange={(e) => setPrice(e.target.value)} type="number" min="1" required />
           <input className={`${inputCls} md:col-span-2`} placeholder="Volumen · 10 L" value={volume} onChange={(e) => setVolume(e.target.value)} />

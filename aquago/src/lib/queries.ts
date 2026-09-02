@@ -186,7 +186,7 @@ export async function getOrdersForUser(userId: number): Promise<OrderView[]> {
   return attachItems(rows);
 }
 
-export async function getAllOrders(): Promise<OrderView[]> {
+export async function getAllOrders(brandId?: number): Promise<OrderView[]> {
   const rows = await db
     .select({
       ...orderSelection,
@@ -197,6 +197,7 @@ export async function getAllOrders(): Promise<OrderView[]> {
     .leftJoin(users, eq(orders.userId, users.id))
     .leftJoin(brands, eq(orders.brandId, brands.id))
     .leftJoin(drivers, eq(orders.driverId, drivers.id))
+    .where(brandId !== undefined ? eq(orders.brandId, brandId) : undefined)
     .orderBy(desc(orders.createdAt))
     .limit(100);
   return attachItems(rows);

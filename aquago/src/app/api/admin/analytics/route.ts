@@ -11,6 +11,8 @@ export async function GET(req: Request) {
   const brandParam = searchParams.get("brandId");
   const brandId = brandParam && brandParam !== "todas" ? Number(brandParam) : undefined;
 
-  const data = await getAnalytics(Number.isInteger(brandId) ? brandId : undefined);
+  // La marca siempre ve solo sus propios datos.
+  const scope = user.role === "marca" ? user.brandId ?? -1 : Number.isInteger(brandId) ? brandId : undefined;
+  const data = await getAnalytics(scope);
   return NextResponse.json(data);
 }

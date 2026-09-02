@@ -18,6 +18,14 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   const body = await req.json().catch(() => null);
   if (!body) return NextResponse.json({ error: "Petición inválida." }, { status: 400 });
 
+  // La marca solo edita a sus propios vendedores.
+  if (user.role === "marca") {
+    const rows = await db.select({ brandId: drivers.brandId }).from(drivers).where(eq(drivers.id, driverId)).limit(1);
+    if (!rows[0] || rows[0].brandId !== user.brandId) {
+      return NextResponse.json({ error: "Ese vendedor es de otra marca." }, { status: 403 });
+    }
+  }
+
   const patch: Record<string, unknown> = {};
   if (typeof body.name === "string" && body.name.trim().length >= 3) patch.name = body.name.trim();
   if (typeof body.phone === "string") patch.phone = body.phone.trim();

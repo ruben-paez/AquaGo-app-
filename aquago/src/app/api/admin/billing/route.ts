@@ -9,7 +9,8 @@ export async function GET() {
   if (!user.isAdmin) return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
 
   await refreshOverdue();
-  const data = await getBilling();
+  // La marca solo ve su propia cuenta corriente.
+  const data = await getBilling(user.role === "marca" ? user.brandId ?? -1 : undefined);
   return NextResponse.json(data);
 }
 
@@ -22,12 +23,18 @@ export async function POST(req: Request) {
   const action = String(body?.action ?? "");
 
   if (action === "run") {
-    const brandId = Number.isInteger(Number(body?.brandId)) ? Number(body.brandId) : undefined;
+    const bodyBrand = Number.isInteger(Number(body?.brandId)) ? Number(body.brandId) : undefined;
+    // La marca solo puede liquidar SU propia cuenta.
+    const brandId = user.role === "marca" ? user.brandId ?? -1 : bodyBrand;
     const results = await runSettlements(brandId);
     return NextResponse.json({ results });
   }
 
   if (action === "pay") {
+    // Registrar el pago es tarea exclusiva de la plataforma.
+    if (user.role !== "plataforma") {
+      return NextResponse.json({ error: "Solo la plataforma registra pagos." }, { status: 403 });
+    }
     const id = Number(body?.settlementId);
     if (!Number.isInteger(id)) {
       return NextResponse.json({ error: "Liquidación inválida." }, { status: 400 });

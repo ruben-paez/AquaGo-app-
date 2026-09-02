@@ -29,6 +29,21 @@ export async function PATCH(
     return NextResponse.json({ error: "Petición inválida." }, { status: 400 });
   }
 
+  // La marca solo puede modificar pedidos de SU marca.
+  if (user.role === "marca") {
+    const own = await db
+      .select({ brandId: orders.brandId })
+      .from(orders)
+      .where(eq(orders.id, orderId))
+      .limit(1);
+    if (own.length === 0) {
+      return NextResponse.json({ error: "Pedido no encontrado." }, { status: 404 });
+    }
+    if (own[0].brandId !== user.brandId) {
+      return NextResponse.json({ error: "Acceso restringido." }, { status: 403 });
+    }
+  }
+
   const patch: Record<string, unknown> = { updatedAt: new Date() };
 
   if (typeof body.status === "string" && ORDER_STATUSES.includes(body.status as (typeof ORDER_STATUSES)[number])) {
