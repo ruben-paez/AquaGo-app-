@@ -291,9 +291,6 @@ export default async function Home() {
               <h2 className="font-display text-3xl font-bold tracking-tight">
                 Catálogo de {featured?.name ?? "AQUAnat"}
               </h2>
-              <p className="mt-2 text-ink-soft">
-                El bidón de 20 L es el corazón del negocio; el resto se suma desde el panel.
-              </p>
             </div>
             <Link
               href="/pedir"

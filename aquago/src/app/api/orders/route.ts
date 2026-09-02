@@ -1,13 +1,14 @@
 import { NextResponse } from "next/server";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
-import { orders, orderItems, products, brands, commissions } from "@/db/schema";
+import { orders, orderItems, products, brands, commissions, users } from "@/db/schema";
 import { getSessionUser } from "@/lib/auth";
 import { getOrdersForUser } from "@/lib/queries";
-import { newOrderCode } from "@/lib/format";
+import { formatGs, newOrderCode } from "@/lib/format";
 import { computeOrderEconomics, collectionModeFor } from "@/lib/pricing";
 import { zoneFor } from "@/lib/zones";
 import { assignOrder, DispatchMode } from "@/lib/dispatch";
+import { sendPushToUser } from "@/lib/push";
 
 export async function GET() {
   const user = await getSessionUser();
@@ -177,6 +178,28 @@ export async function POST(req: Request) {
 
     return order;
   });
+
+  // Aviso a la marca: push a todos sus usuarios en cuanto entra el pedido.
+  // Es "best effort": si algo falla, el pedido sigue su curso normal.
+  try {
+    const brandUsers = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(and(eq(users.role, "marca"), eq(users.brandId, brandId)));
+    const cant = orderItemsValues.length;
+    await Promise.all(
+      brandUsers.map((u) =>
+        sendPushToUser(u.id, {
+          title: `🚨 Pedido nuevo ${created.code}`,
+          body: `${user.name} · ${cant} ${cant === 1 ? "producto" : "productos"} · ${formatGs(created.total)}`,
+          url: "/admin",
+          tag: `order-${created.id}`,
+        })
+      )
+    );
+  } catch {
+    // el push nunca tumba la creación del pedido
+  }
 
   // Despacho automático: apenas entra el pedido se busca al mejor repartidor.
   if (brand.autoAssign) {
