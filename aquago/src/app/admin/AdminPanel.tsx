@@ -19,6 +19,7 @@ import DispatchTab from "./DispatchTab";
 import LiveTab from "./LiveTab";
 import SettingsTab from "./SettingsTab";
 import BrandsTab from "./BrandsTab";
+import CustomersTab from "./CustomersTab";
 import ProofReview from "./ProofReview";
 
 interface AdminProduct {
@@ -36,7 +37,7 @@ export default function AdminPanel({ userRole = "plataforma" }: { userRole?: str
   const [orders, setOrders] = useState<OrderView[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [brands, setBrands] = useState<BrandView[]>([]);
-  const [tab, setTab] = useState<"pedidos" | "reparto" | "envivo" | "marcas" | "ajustes" | "productos" | "comisiones" | "datos">("pedidos");
+  const [tab, setTab] = useState<"pedidos" | "reparto" | "envivo" | "clientes" | "marcas" | "ajustes" | "productos" | "comisiones" | "datos">("pedidos");
   const [filter, setFilter] = useState<string>("todos");
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<string>("");
@@ -171,6 +172,7 @@ export default function AdminPanel({ userRole = "plataforma" }: { userRole?: str
             ["pedidos", "Pedidos"],
             ["reparto", "Reparto"],
             ["envivo", "En vivo"],
+            ["clientes", "Clientes"],
             ...(userRole === "plataforma" ? ([["marcas", "Marcas"], ["ajustes", "Ajustes"]] as const) : []),
             ["productos", "Catálogo"],
             ["comisiones", "Comisiones"],
@@ -191,6 +193,7 @@ export default function AdminPanel({ userRole = "plataforma" }: { userRole?: str
 
       {tab === "reparto" && <DispatchTab />}
       {tab === "envivo" && <LiveTab />}
+      {tab === "clientes" && <CustomersTab />}
       {tab === "marcas" && <BrandsTab />}
       {tab === "ajustes" && <SettingsTab />}
       {tab === "comisiones" && <BillingTab />}

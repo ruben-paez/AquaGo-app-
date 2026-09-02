@@ -17,6 +17,7 @@ export default function RegisterForm() {
   const [pos, setPos] = useState<[number, number] | null>(null);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [accepted, setAccepted] = useState(false);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -185,6 +186,25 @@ export default function RegisterForm() {
               </p>
             )}
           </div>
+          <label className="flex items-start gap-2 text-xs text-ink-soft">
+            <input
+              type="checkbox"
+              checked={accepted}
+              onChange={(e) => setAccepted(e.target.checked)}
+              className="mt-0.5 h-4 w-4 shrink-0 accent-[#105c88]"
+            />
+            <span>
+              Acepto los{" "}
+              <a href="/terminos" target="_blank" className="font-semibold text-water-700 underline">
+                Términos y Condiciones
+              </a>{" "}
+              y la{" "}
+              <a href="/privacidad" target="_blank" className="font-semibold text-water-700 underline">
+                Política de Privacidad
+              </a>
+              .
+            </span>
+          </label>
         </form>
       <p className="pb-6 pt-8 text-center text-xs text-ink-soft">
         {`Zona de reparto: Encarnación, Itapúa · centro del mapa ${ENCARNACION_CENTER[0].toFixed(3)}, ${ENCARNACION_CENTER[1].toFixed(3)}`}

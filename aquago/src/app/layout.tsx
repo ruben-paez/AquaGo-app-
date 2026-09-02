@@ -5,6 +5,7 @@ import SessionBridge from "@/components/SessionBridge";
 import PushSetup from "@/components/PushSetup";
 import DemoBar from "@/components/DemoBar";
 import { getSessionToken } from "@/lib/auth";
+import { getCompanySettings } from "@/lib/company-settings";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -55,6 +56,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   // parámetro `?s=`, el cliente se queda sin sesión y los pedidos salían con
   // "Debes iniciar sesión para pedir" aunque la pantalla se viera logueada.
   const token = await getSessionToken();
+  const company = await getCompanySettings();
 
   return (
     <html lang="es" className={`${manrope.variable} ${sora.variable}`}>
@@ -66,9 +68,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <PushSetup />
         <DemoBar />
         {children}
-        <footer className="border-t border-ink/10 bg-white py-6 text-center">
+        <footer className="mt-auto border-t border-ink/10 bg-white py-6 text-center">
           <p className="text-xs font-semibold text-ink-soft">
             © {new Date().getFullYear()} <span className="font-display font-bold text-water-800">AquaGo Company</span> · Todos los derechos reservados
+          </p>
+          <p className="mt-2 flex flex-wrap items-center justify-center gap-x-3 gap-y-1 text-xs font-semibold">
+            <a href="/terminos" className="text-water-700 transition hover:underline">Términos</a>
+            <span className="text-ink/20">·</span>
+            <a href="/privacidad" className="text-water-700 transition hover:underline">Privacidad</a>
+            <span className="text-ink/20">·</span>
+            <a href="/ayuda" className="text-water-700 transition hover:underline">Ayuda</a>
           </p>
         </footer>
       </body>
