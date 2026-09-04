@@ -124,6 +124,13 @@ function OrderCard({
   const hasMap = order.lat != null && order.lng != null;
   const [chatOpen, setChatOpen] = useState(false);
 
+  // Pedidos fuera del horario de reparto (antes de 8:00 / después de 21:00):
+  // en vez de dejar al cliente a las oscuras, le decimos cuándo entra en el
+  // primer reparto. De día muestra que se está buscando vendedor.
+  const hour = new Date().getHours();
+  const antesDeAbrir = hour < 8;
+  const fueraDeHorario = antesDeAbrir || hour >= 21;
+
   return (
     <article className={`rounded-2xl border bg-white p-5 shadow-card ${live ? "border-water-300" : "border-ink/10"}`}>
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -146,6 +153,17 @@ function OrderCard({
           Este pedido fue cancelado.
         </p>
       )}
+
+      {order.status === "pendiente" &&
+        (fueraDeHorario ? (
+          <p className="mt-3 rounded-lg border border-water-200 bg-water-50 px-3 py-2 text-sm font-semibold text-water-800">
+            🌙 Tu pedido quedó agendado: entra en el primer reparto de {antesDeAbrir ? "hoy" : "mañana"} desde las 8:00.
+          </p>
+        ) : (
+          <p className="mt-3 rounded-lg border border-ink/10 bg-paper px-3 py-2 text-sm text-ink-soft">
+            🔎 Estamos buscando vendedor para tu pedido. Te avisamos en cuanto salga.
+          </p>
+        ))}
 
       {/* Timeline */}
       {!cancelled && (
