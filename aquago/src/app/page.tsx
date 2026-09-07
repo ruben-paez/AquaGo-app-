@@ -5,6 +5,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { AquaGoLogo, AquaNatLogo, AquaNatMark, BidonSVG } from "@/components/Brand";
 import { formatGs, formatRating } from "@/lib/format";
 import { getActiveProducts, getBrands } from "@/lib/queries";
+import { getPromo } from "@/lib/company-settings";
 import type { BrandView } from "@/lib/queries";
 import {
   IconBank,
@@ -71,9 +72,16 @@ export default async function Home() {
 
   const featured = brands.find((b) => !b.comingSoon) ?? brands[0];
   const user = await getSessionUser();
+  const promo = await getPromo();
 
   return (
     <div className="flex min-h-dvh flex-col bg-[#0A1930]">
+      {promo.active && promo.text.trim() !== "" && (
+        <div className="bg-gradient-to-r from-[#1B9CE3] to-[#56CCF2] px-4 py-2 text-center text-xs font-bold text-white">
+          {promo.text}
+        </div>
+      )}
+
       {/* ENCABEZADO OSCURO (solo la portada; el resto de la app usa Nav claro) */}
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[#0A1930]/90 backdrop-blur-md">
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">

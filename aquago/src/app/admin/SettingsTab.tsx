@@ -25,6 +25,8 @@ interface Company {
 export default function SettingsTab() {
   const [f, setF] = useState<Settings>({ bank: "", account: "", holder: "", alias: "", note: "" });
   const [co, setCo] = useState<Company>({ name: "AquaGo", email: "aquagocompany@gmail.com", phone: "0991 945 969" });
+  const [promoOn, setPromoOn] = useState(false);
+  const [promoText, setPromoText] = useState("");
   const [loaded, setLoaded] = useState(false);
   const [msg, setMsg] = useState("");
   const [busy, setBusy] = useState(false);
@@ -35,6 +37,10 @@ export default function SettingsTab() {
       .then((d) => {
         setF({ bank: "", account: "", holder: "", alias: "", note: "", ...d.settings });
         if (d.company) setCo(d.company);
+        if (d.promo) {
+          setPromoOn(Boolean(d.promo.active));
+          setPromoText(d.promo.text ?? "");
+        }
         setLoaded(true);
       })
       .catch(() => setLoaded(true));
@@ -52,6 +58,8 @@ export default function SettingsTab() {
           companyName: co.name,
           supportEmail: co.email,
           supportPhone: co.phone,
+          promoActive: promoOn,
+          promoText,
         }),
       });
       const d = await res.json();
@@ -140,6 +148,36 @@ export default function SettingsTab() {
           </div>
         </div>
         <p className="mt-2 text-[11px] text-ink-soft">Se guardan junto con los datos de transferencia (un solo botón Guardar).</p>
+      </div>
+
+      <div className="rounded-xl border border-ink/10 bg-white p-4 shadow-card">
+        <p className="font-display text-sm font-bold">🎉 Promo de lanzamiento</p>
+        <p className="mt-0.5 text-xs text-ink-soft">
+          Cartel que se muestra en la portada y en la pantalla Pedir (máx. 140 caracteres).
+          Es informativo: no cambia precios.
+        </p>
+        <div className="mt-3 grid gap-3">
+          <label className="flex items-center gap-2 text-sm font-semibold">
+            <input
+              type="checkbox"
+              checked={promoOn}
+              onChange={(e) => setPromoOn(e.target.checked)}
+              className="h-4 w-4 accent-water-700"
+            />
+            Mostrar el cartel de promo
+          </label>
+          <div>
+            <label className="text-[10px] font-bold uppercase tracking-wider text-ink-soft">Texto del cartel</label>
+            <input
+              value={promoText}
+              onChange={(e) => setPromoText(e.target.value)}
+              maxLength={140}
+              placeholder="🎉 Lanzamiento: envío sin cargo + seguimiento en vivo"
+              className="mt-0.5 w-full rounded-md border border-ink/15 bg-white px-2.5 py-2 text-sm outline-none focus:border-water-500"
+            />
+          </div>
+        </div>
+        <p className="mt-2 text-[11px] text-ink-soft">Se activa y desactiva con el mismo botón Guardar de arriba.</p>
       </div>
     </div>
   );

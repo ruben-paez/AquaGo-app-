@@ -35,6 +35,8 @@ export async function PUT(req: Request) {
     company_name: body.companyName,
     support_email: body.supportEmail,
     support_phone: body.supportPhone,
+    promo_active: body.promoActive ? "1" : "0",
+    promo_text: String(body.promoText ?? "").slice(0, 140),
   };
   const keys = Object.keys(fields) as (keyof typeof fields)[];
   for (const key of keys) {

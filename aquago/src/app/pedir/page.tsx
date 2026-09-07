@@ -4,6 +4,7 @@ import type { PublicUser } from "@/lib/auth";
 import Nav from "@/components/Nav";
 import OrderWizard from "./OrderWizard";
 import { IconBottle } from "@/components/icons";
+import { getPromo } from "@/lib/company-settings";
 
 // Nunca servir una copia cacheada: el token de sesión viaja en el HTML y una
 // versión vieja traería un token muerto (de ahí el "Debes iniciar sesión").
@@ -17,10 +18,18 @@ export default async function PedirPage() {
   // Se lo pasamos al wizard como prop: es la vía más confiable, no depende
   // de cookies, del DOM ni de la URL.
   const sessionToken = await getSessionToken();
+  const promo = await getPromo();
+
+  const banner = promo.active && promo.text.trim() !== "" && (
+    <div className="bg-gradient-to-r from-water-700 to-water-500 px-4 py-2 text-center text-xs font-bold text-white">
+      {promo.text}
+    </div>
+  );
 
   if (!user) {
     return (
       <div className="flex min-h-dvh flex-col">
+        {banner}
         <Nav />
         <main className="mx-auto flex w-full max-w-md flex-1 flex-col items-center justify-center px-4 py-16 text-center">
           <span className="grid h-16 w-16 place-items-center rounded-2xl bg-water-100 text-water-700">
@@ -52,6 +61,7 @@ export default async function PedirPage() {
 
   return (
     <div className="flex min-h-dvh flex-col">
+      {banner}
       <Nav />
       <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-8 sm:px-6">
         <OrderWizard user={user} sessionToken={sessionToken} />
