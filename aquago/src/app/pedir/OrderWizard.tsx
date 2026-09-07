@@ -39,6 +39,28 @@ const CATEGORY_ORDER: [string, string][] = [
   ["otros", "Otros"],
 ];
 
+
+/**
+ * Aviso de conversión al Pixel de Meta: evento "Purchase" con el total del
+ * pedido en guaraníes. Si el pixel no está configurado (no hay
+ * NEXT_PUBLIC_META_PIXEL_ID), window.fbq no existe y esto no hace nada.
+ */
+function trackPurchase(order: { id: number; code?: string; total: number }) {
+  if (typeof window === "undefined") return;
+  const fbq = (window as unknown as { fbq?: (...args: unknown[]) => void }).fbq;
+  if (typeof fbq !== "function") return;
+  fbq(
+    "track",
+    "Purchase",
+    {
+      value: order.total,
+      currency: "PYG",
+      content_name: order.code ?? "Pedido AquaGo",
+    },
+    { eventID: `order-${order.id}` }
+  );
+}
+
 export default function OrderWizard({
   user,
   sessionToken,
@@ -220,6 +242,9 @@ export default function OrderWizard({
 
       setPlaced(data.order);
       setStep(5);
+      // Conversión para Meta Ads: le avisa al Pixel que hubo una compra real
+      // (con el monto en guaraníes). Si no hay pixel configurado, no hace nada.
+      trackPurchase(data.order);
       fetch("/api/me", {
         method: "PATCH",
         headers: apiHeaders({ "Content-Type": "application/json" }),
