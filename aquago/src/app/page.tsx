@@ -2,7 +2,7 @@ import Link from "next/link";
 import { getSessionUser } from "@/lib/auth";
 import LogoutButton from "@/components/LogoutButton";
 import StatusBadge from "@/components/StatusBadge";
-import { AquaGoLogo, AquaNatLogo, AquaNatMark, BidonSVG } from "@/components/Brand";
+import { AquaGoLogo, AquaNatLogo, AquaNatMark } from "@/components/Brand";
 import { formatGs, formatRating } from "@/lib/format";
 import { getActiveProducts, getBrands } from "@/lib/queries";
 import { getPromo } from "@/lib/company-settings";
@@ -229,10 +229,13 @@ export default async function Home() {
 
             {/* Ticket de pedido en vivo */}
             <div className="relative mx-auto w-full max-w-md">
-              <div className="absolute -left-10 -top-8 hidden opacity-95 lg:block">
-                <BidonSVG className="h-64 -rotate-6 drop-shadow-xl" />
+              {/* Marca de agua del logo detrás de la tarjeta (solo PC): presencia
+                  de marca sin tapar contenido. En mobile queda limpio. */}
+              <div className="pointer-events-none absolute inset-0 -z-10 hidden items-center justify-center lg:flex">
+                <div className="absolute h-72 w-72 rounded-full bg-[#56CCF2]/10 blur-3xl" />
+                <AquaGoLogo className="h-80 opacity-[0.08] brightness-0 invert" />
               </div>
-              <div className="relative rounded-2xl border border-white/10 bg-[#10233E] p-5 shadow-pop lg:ml-20">
+              <div className="relative rounded-2xl border border-white/10 bg-[#10233E] p-5 shadow-pop">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[11px] font-bold uppercase tracking-wider text-white/50">Pedido</p>
@@ -304,7 +307,7 @@ export default async function Home() {
                   </div>
                 </div>
               </div>
-              <p className="mt-3 text-center text-xs font-semibold text-white/50 lg:ml-20">
+              <p className="mt-3 text-center text-xs font-semibold text-white/50">
                 Así ves tu pedido dentro de la app.
               </p>
             </div>
