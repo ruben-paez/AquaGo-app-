@@ -123,30 +123,18 @@ function OrderCard({
   const cancelled = order.status === "cancelada";
   const hasMap = order.lat != null && order.lng != null;
   const [chatOpen, setChatOpen] = useState(false);
-  const [pdfBusy, setPdfBusy] = useState(false);
 
   // Comprobante en PDF: solo existe para pedidos entregados.
-  async function downloadInvoice() {
-    setPdfBusy(true);
-    try {
-      const res = await fetch(`/api/orders/${order.id}/invoice`, {
-        headers: token ? { "x-aquago-session": token } : undefined,
-      });
-      if (!res.ok) throw new Error();
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `comprobante-${order.code}.pdf`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    } catch {
-      alert("No se pudo generar el comprobante.");
-    } finally {
-      setPdfBusy(false);
-    }
+  // Descarga NATIVA (navegación con Content-Disposition), sin fetch ni blob:
+  // el navegador la maneja con cookies y no depende de trucos que en
+  // Chrome de Android fallan ("Error: Sin archivos").
+  function downloadInvoice() {
+    const a = document.createElement("a");
+    a.href = `/api/orders/${order.id}/invoice`;
+    a.download = `comprobante-${order.code}.pdf`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
   }
 
   // Pedidos fuera del horario de reparto (antes de 8:00 / después de 21:00):
@@ -244,11 +232,10 @@ function OrderCard({
 
       {order.status === "entregada" && (
         <button
-          onClick={() => void downloadInvoice()}
-          disabled={pdfBusy}
-          className="mt-3 w-full rounded-xl bg-water-700 px-4 py-2.5 font-display text-sm font-bold text-white shadow-card transition hover:bg-water-800 disabled:opacity-50"
+          onClick={downloadInvoice}
+          className="mt-3 w-full rounded-xl bg-water-700 px-4 py-2.5 font-display text-sm font-bold text-white shadow-card transition hover:bg-water-800"
         >
-          {pdfBusy ? "Generando PDF…" : "📄 Descargar comprobante"}
+          📄 Descargar comprobante
         </button>
       )}
 
