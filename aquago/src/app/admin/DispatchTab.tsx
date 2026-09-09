@@ -42,9 +42,9 @@ interface DispatchData {
 }
 
 const VEHICLE_ICON: Record<string, string> = {
-  moto: "🛵",
+  moto: "🛻",
   camioneta: "🛻",
-  camion: "🚚",
+  camion: "🛻",
 };
 
 const DRIVER_STATUS: Record<string, { label: string; cls: string }> = {

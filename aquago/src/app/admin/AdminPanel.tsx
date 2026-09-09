@@ -277,10 +277,32 @@ function OrderRow({
 }) {
   const [driver, setDriver] = useState(order.driverName);
   const [showMap, setShowMap] = useState(false);
+  const [pdfBusy, setPdfBusy] = useState(false);
   const closed = order.status === "entregada" || order.status === "cancelada";
 
   function saveDriver() {
     if (driver.trim() !== order.driverName) onPatch({ driverName: driver });
+  }
+
+  async function downloadInvoice() {
+    setPdfBusy(true);
+    try {
+      const res = await fetch(`/api/orders/${order.id}/invoice`);
+      if (!res.ok) throw new Error();
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `comprobante-${order.code}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } catch {
+      alert("No se pudo generar el comprobante.");
+    } finally {
+      setPdfBusy(false);
+    }
   }
 
   return (
@@ -311,6 +333,15 @@ function OrderRow({
           {order.lat != null && order.lng != null && (
             <button onClick={() => setShowMap((v) => !v)} className="mt-1.5 text-xs font-bold text-water-700 hover:underline">
               {showMap ? "Ocultar mapa" : "Ver mapa"}
+            </button>
+          )}
+          {order.status === "entregada" && (
+            <button
+              onClick={() => void downloadInvoice()}
+              disabled={pdfBusy}
+              className="ml-3 mt-1.5 text-xs font-bold text-water-700 hover:underline disabled:opacity-50"
+            >
+              {pdfBusy ? "Generando…" : "📄 Comprobante"}
             </button>
           )}
           {showMap && order.lat != null && order.lng != null && (

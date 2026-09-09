@@ -386,7 +386,7 @@ export default function DriverPanel() {
                       </div>
                       <p className="mt-1 text-sm font-semibold">{o.addressLabel}</p>
                       <p className="text-xs text-ink-soft">
-                        Zona: {o.zone || "—"} · {o.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}
+                        {o.items.map((i) => `${i.quantity}× ${i.name}`).join(", ")}
                       </p>
                       <p className="mt-1 text-sm">
                         <b>{formatGs(o.total)}</b>{" "}
@@ -411,7 +411,7 @@ export default function DriverPanel() {
                             onClick={() => setStatus(o.id, "en_camino")}
                             className="rounded-xl bg-amber-500 px-4 py-2 font-display text-sm font-bold text-white transition hover:bg-amber-600 disabled:opacity-50"
                           >
-                            🛵 Salí hacia el cliente
+                            🛻 Salí hacia el cliente
                           </button>
                         )}
                         {o.status === "en_camino" && (

@@ -1,7 +1,7 @@
 "use client";
 
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import L, { type LeafletEvent } from "leaflet";
 import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ENCARNACION_CENTER } from "@/lib/format";
@@ -23,6 +23,23 @@ function ClickHandler({ onPick }: { onPick: (lat: number, lng: number) => void }
   return null;
 }
 
+/** Escucha interacción del usuario: a partir de ahí, la vista es suya. */
+function TouchTracker() {
+  useMapEvents({
+    dragstart() {
+      touchState.touched = true;
+    },
+    zoomstart(e: LeafletEvent & { hard?: boolean }) {
+      // hard = animación propia del mapa (no del usuario)
+      if (!e.hard) touchState.touched = true;
+    },
+  });
+  return null;
+}
+
+// Estado compartido: TouchTracker lo prende cuando el usuario mueve el mapa.
+const touchState: { touched: boolean } = { touched: false };
+
 export interface LeafletMapProps {
   center: [number, number] | null;
   onChange?: (lat: number, lng: number) => void;
@@ -41,6 +58,8 @@ export default function LeafletMap({
   const mapRef = useRef<L.Map | null>(null);
   const [satellite, setSatellite] = useState(false);
   const hasCenter = center !== null;
+  // Si el usuario movió o zoom-eó el mapa, la vista es SUYA: nada la pisa.
+  const lastCentered = useRef<[number, number] | null>(null);
 
   // El icono se crea dentro del componente: así Leaflet nunca se evalúa en el servidor.
   const pinIcon = useMemo(
@@ -60,7 +79,19 @@ export default function LeafletMap({
   useEffect(() => {
     const map = mapRef.current;
     if (!map || lat == null || lng == null) return;
-    map.flyTo([lat, lng], Math.max(map.getZoom(), zoom), { duration: 0.6 });
+    const prev = lastCentered.current;
+    lastCentered.current = [lat, lng];
+    // Primera vez: encuadre inicial.
+    if (!prev) {
+      map.setView([lat, lng], Math.max(map.getZoom(), zoom));
+      return;
+    }
+    // El usuario ya tomó el mapa: no se recentra ni se toca el zoom.
+    if (touchState.touched) return;
+    // Cambio externo del punto: se centra sin tocar el zoom elegido.
+    if (Math.abs(prev[0] - lat) + Math.abs(prev[1] - lng) > 0.0001) {
+      map.setView([lat, lng], map.getZoom());
+    }
   }, [lat, lng, zoom]);
 
   const handleLocate = () => {
@@ -104,6 +135,7 @@ export default function LeafletMap({
               maxZoom={19}
             />
           )}
+          <TouchTracker />
           {hasCenter && <Marker position={center} icon={pinIcon} />}
           {onChange && <ClickHandler onPick={onChange} />}
         </MapContainer>

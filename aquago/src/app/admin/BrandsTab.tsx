@@ -46,7 +46,7 @@ interface Vendor {
   user: VendorUser | null;
 }
 
-const VEHICLE_ICON: Record<string, string> = { moto: "🛵", camioneta: "🛻", camion: "🚚" };
+const VEHICLE_ICON: Record<string, string> = { moto: "🛻", camioneta: "🛻", camion: "🛻" };
 const pct = (bps: number) => `${(bps / 100).toFixed(bps % 100 === 0 ? 0 : 1)} %`;
 
 export default function BrandsTab() {
@@ -440,7 +440,7 @@ function VendorRow({ vendor, onChanged }: { vendor: Vendor; onChanged: () => voi
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <p className="text-sm font-bold">
-            {VEHICLE_ICON[vendor.vehicle] ?? "🛵"} {vendor.name}
+            {VEHICLE_ICON[vendor.vehicle] ?? "🛻"} {vendor.name}
             {!vendor.active && (
               <span className="ml-2 rounded-full bg-ink/5 px-2 py-0.5 text-[10px] font-bold text-ink-soft">INACTIVO</span>
             )}

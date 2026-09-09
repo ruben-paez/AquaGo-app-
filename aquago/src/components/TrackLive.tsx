@@ -101,7 +101,7 @@ export default function TrackLive({ orderId, token }: { orderId: number; token?:
       <LiveMap markers={markers} path={path} heightClass="h-64" />
       <p className="mt-2 text-xs font-semibold text-cyan-800">
         {order.status === "en_camino"
-          ? `🛵 ${driver?.name ?? "Tu repartidor"} va en camino${etaMin ? ` · llega en ~${etaMin} min` : ""}`
+          ? `🛻 ${driver?.name ?? "Tu repartidor"} va en camino${etaMin ? ` · llega en ~${etaMin} min` : ""}`
           : "📍 Mapa de tu entrega"}
         {tick < 0 ? "" : ""}
       </p>

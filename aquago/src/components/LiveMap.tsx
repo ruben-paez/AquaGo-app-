@@ -9,7 +9,7 @@ import { ENCARNACION_CENTER } from "@/lib/format";
 export type MarkerKind = "driver" | "store" | "stop" | "dest";
 
 const COLORS: Record<MarkerKind, { fill: string; glyph: (n?: number) => string }> = {
-  driver: { fill: "#1d4ed8", glyph: () => "🛵" },
+  driver: { fill: "#1d4ed8", glyph: () => "🛻" },
   store: { fill: "#105c88", glyph: () => "🏪" },
   stop: { fill: "#0f766e", glyph: (n) => String(n ?? "?") },
   dest: { fill: "#b45309", glyph: () => "🏠" },
