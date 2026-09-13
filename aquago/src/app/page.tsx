@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSessionUser } from "@/lib/auth";
 import LogoutButton from "@/components/LogoutButton";
 import StatusBadge from "@/components/StatusBadge";
+import InstallApp from "@/components/InstallApp";
 import { AquaGoLogo, AquaNatLogo, AquaNatMark } from "@/components/Brand";
 import { formatGs, formatRating } from "@/lib/format";
 import { getActiveProducts, getBrands } from "@/lib/queries";
@@ -478,6 +479,28 @@ export default async function Home() {
           </div>
         </section>
       </main>
+
+      {/* DESCARGÁ LA APP */}
+      <section id="app" className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
+        <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-br from-[#10233E] via-[#0E1E36] to-[#0C1A2F] p-8 text-center shadow-pop sm:p-12">
+          <div className="pointer-events-none absolute -left-20 -top-20 h-56 w-56 rounded-full bg-[#56CCF2]/10 blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-24 -right-16 h-56 w-56 rounded-full bg-[#1B9CE3]/10 blur-3xl" />
+          <p className="text-4xl">📲💧</p>
+          <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-white">
+            Llevá AquaGo en tu bolsillo
+          </h2>
+          <p className="mx-auto mt-3 max-w-md text-white/60">
+            Instalala como una app más, sin tiendas ni descargas pesadas: pedí tu bidón
+            con un toque y seguí el reparto desde el ícono.
+          </p>
+          <div className="mt-7 flex justify-center">
+            <InstallApp />
+          </div>
+          <p className="mt-4 text-xs font-semibold text-white/40">
+            Android y iPhone · no ocupa espacio · entrada directa a tus pedidos
+          </p>
+        </div>
+      </section>
 
       {/* FOOTER */}
       <footer className="bg-[#081426] text-white">
