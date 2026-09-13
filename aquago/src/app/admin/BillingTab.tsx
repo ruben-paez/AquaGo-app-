@@ -170,6 +170,39 @@ export default function BillingTab({ userRole = "plataforma" }: { userRole?: str
         </p>
       )}
 
+      {/* Avisos de marcas con deudas: cobro rápido y reactivación al instante.
+          Marcar pagada la liquidación levanta la suspensión sola. */}
+      {esAdmin &&
+        data.brands
+          .filter((b) => b.billingStatus === "suspendida" || b.billingStatus === "por_vencer")
+          .map((b) => {
+            const st = data.settlements.find((s) => s.brandId === b.id && s.status !== "pagada");
+            const suspendida = b.billingStatus === "suspendida";
+            return (
+              <div
+                key={b.id}
+                className={`flex flex-wrap items-center justify-between gap-3 rounded-xl border px-4 py-3 ${
+                  suspendida ? "border-danger/30 bg-danger-soft" : "border-warn/30 bg-warn-soft"
+                }`}
+              >
+                <p className={`text-sm font-semibold ${suspendida ? "text-danger" : "text-warn"}`}>
+                  {suspendida ? "⛔" : "⚠️"} <strong>{b.name}</strong> está{" "}
+                  {suspendida ? "suspendida" : "con liquidación por vencer"} — le corresponde{" "}
+                  {formatGs(st?.amountDue ?? 0)}.
+                </p>
+                {st && (
+                  <button
+                    onClick={() => pay(st.id)}
+                    disabled={busy}
+                    className="rounded-lg bg-ok px-4 py-2 text-xs font-bold text-white transition hover:brightness-110 disabled:opacity-50"
+                  >
+                    ✅ Marcar pagada y reactivar
+                  </button>
+                )}
+              </div>
+            );
+          })}
+
       {/* Marcas y su cuenta corriente */}
       <div>
         <h3 className="text-xs font-bold uppercase tracking-wider text-ink-soft">
