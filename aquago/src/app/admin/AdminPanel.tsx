@@ -142,6 +142,18 @@ export default function AdminPanel({ userRole = "plataforma" }: { userRole?: str
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <a
+            href="/api/admin/export?what=pedidos"
+            className="rounded-lg border border-water-600/30 bg-water-50 px-3 py-2 text-xs font-bold text-water-700 transition hover:bg-water-100"
+          >
+            ⬇️ Pedidos
+          </a>
+          <a
+            href="/api/admin/export?what=clientes"
+            className="rounded-lg border border-water-600/30 bg-water-50 px-3 py-2 text-xs font-bold text-water-700 transition hover:bg-water-100"
+          >
+            ⬇️ Clientes
+          </a>
           <PasswordButton />
           {updatedAt && (
             <span className="text-xs font-semibold text-ink-soft">
