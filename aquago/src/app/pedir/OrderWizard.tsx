@@ -763,7 +763,7 @@ export default function OrderWizard({
                 <button
                   onClick={confirmOrder}
                   disabled={placing}
-                  className="flex items-center gap-2 rounded-xl bg-ok px-5 py-3 font-display text-sm font-bold text-white transition hover:brightness-110 disabled:opacity-50"
+                  className="flex items-center gap-2 rounded-xl bg-[#F87E6D] px-5 py-3 font-display text-sm font-bold text-white shadow-pop transition hover:bg-[#f96a55] disabled:opacity-50"
                 >
                   {placing ? "Confirmando…" : `Confirmar · ${formatGs(total)}`}
                 </button>

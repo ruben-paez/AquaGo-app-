@@ -86,7 +86,7 @@ export default function OrdersTracker({
       {active.length > 0 && (
         <section className="mt-6 space-y-4">
           <h2 className="text-xs font-bold uppercase tracking-wider text-ink-soft">
-            ⏳ Pendientes ({active.length})
+            Pendientes ({active.length})
           </h2>
           {active.map((o) => (
             <OrderCard key={o.id} order={o} live token={sessionToken} />
@@ -170,11 +170,11 @@ function OrderCard({
       {order.status === "pendiente" &&
         (fueraDeHorario ? (
           <p className="mt-3 rounded-lg border border-water-200 bg-water-50 px-3 py-2 text-sm font-semibold text-water-800">
-            🌙 Tu pedido quedó agendado: entra en el primer reparto de {antesDeAbrir ? "hoy" : "mañana"} desde las 8:00.
+            Agendado: tu pedido entra en el primer reparto de {antesDeAbrir ? "hoy" : "mañana"} desde las 8:00.
           </p>
         ) : (
           <p className="mt-3 rounded-lg border border-ink/10 bg-paper px-3 py-2 text-sm text-ink-soft">
-            🔎 Estamos buscando vendedor para tu pedido. Te avisamos en cuanto salga.
+            Buscando vendedor para tu pedido. Te avisamos en cuanto salga.
           </p>
         ))}
 
@@ -235,7 +235,7 @@ function OrderCard({
           onClick={downloadInvoice}
           className="mt-3 w-full rounded-xl bg-water-700 px-4 py-2.5 font-display text-sm font-bold text-white shadow-card transition hover:bg-water-800"
         >
-          📄 Descargar comprobante
+          Descargar comprobante (PDF)
         </button>
       )}
 
@@ -251,7 +251,7 @@ function OrderCard({
             onClick={() => setChatOpen((v) => !v)}
             className="w-full rounded-xl border border-ink/15 bg-white px-4 py-2.5 font-display text-sm font-bold text-water-700 transition hover:bg-water-50"
           >
-            💬 {chatOpen ? "Cerrar conversación" : "Conversar con el vendedor"}
+            {chatOpen ? "Cerrar conversación" : "Conversar con el vendedor"}
           </button>
           {chatOpen && (
             <div className="mt-2">

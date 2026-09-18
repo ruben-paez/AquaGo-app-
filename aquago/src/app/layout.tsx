@@ -4,7 +4,8 @@ import { Manrope, Sora } from "next/font/google";
 import SessionBridge from "@/components/SessionBridge";
 import PushSetup from "@/components/PushSetup";
 import DemoBar from "@/components/DemoBar";
-import { getSessionToken } from "@/lib/auth";
+import { getSessionToken, getSessionUser } from "@/lib/auth";
+import BottomNav from "@/components/BottomNav";
 import { getCompanySettings } from "@/lib/company-settings";
 import Script from "next/script";
 import "./globals.css";
@@ -58,6 +59,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   // "Debes iniciar sesión para pedir" aunque la pantalla se viera logueada.
   const token = await getSessionToken();
   const company = await getCompanySettings();
+  const navUser = await getSessionUser();
 
   return (
     <html lang="es" className={`${manrope.variable} ${sora.variable}`}>
@@ -90,7 +92,8 @@ fbq('init', '${process.env.NEXT_PUBLIC_META_PIXEL_ID}');fbq('track', 'PageView')
         <SessionBridge />
       <PushSetup />
         <DemoBar />
-        {children}
+        <div className="pb-[76px]">{children}</div>
+        <BottomNav role={navUser?.role ?? null} />
         <footer className="mt-auto border-t border-ink/10 bg-white py-6 text-center">
           <p className="text-xs font-semibold text-ink-soft">
             © {new Date().getFullYear()} <span className="font-display font-bold text-water-800">AquaGo Company</span> · Todos los derechos reservados

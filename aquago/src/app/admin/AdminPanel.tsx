@@ -33,11 +33,22 @@ interface AdminProduct {
   active: boolean;
 }
 
-export default function AdminPanel({ userRole = "plataforma" }: { userRole?: string }) {
+const TAB_KEYS = ["pedidos", "reparto", "envivo", "clientes", "marcas", "ajustes", "productos", "comisiones", "datos"] as const;
+type TabKey = (typeof TAB_KEYS)[number];
+
+export default function AdminPanel({
+  userRole = "plataforma",
+  initialTab,
+}: {
+  userRole?: string;
+  initialTab?: string;
+}) {
   const [orders, setOrders] = useState<OrderView[]>([]);
   const [products, setProducts] = useState<AdminProduct[]>([]);
   const [brands, setBrands] = useState<BrandView[]>([]);
-  const [tab, setTab] = useState<"pedidos" | "reparto" | "envivo" | "clientes" | "marcas" | "ajustes" | "productos" | "comisiones" | "datos">("pedidos");
+  const [tab, setTab] = useState<TabKey>(
+    initialTab && (TAB_KEYS as readonly string[]).includes(initialTab) ? (initialTab as TabKey) : "pedidos"
+  );
   const [filter, setFilter] = useState<string>("todos");
   const [loading, setLoading] = useState(true);
   const [updatedAt, setUpdatedAt] = useState<string>("");

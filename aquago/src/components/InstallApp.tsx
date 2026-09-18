@@ -78,38 +78,38 @@ export default function InstallApp() {
           onClick={() => setModal(false)}
         >
           <div
-            className="w-full max-w-sm rounded-2xl border border-white/10 bg-[#10233E] p-6 text-left shadow-pop"
+            className="w-full max-w-sm rounded-2xl border border-ink/10 bg-white p-6 text-left shadow-pop"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="font-display text-lg font-bold text-white">
+            <p className="font-display text-lg font-bold text-ink">
               {esIOS() ? "📥 Agregala en 2 toques" : "📥 Instalala en segundos"}
             </p>
 
             {esIOS() ? (
-              <ol className="mt-4 space-y-3 text-sm text-white/80">
+              <ol className="mt-4 space-y-3 text-sm text-ink-soft">
                 <li className="flex gap-3">
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#1B9CE3] text-xs font-bold text-white">1</span>
-                  Tocá el botón <strong className="text-white">Compartir</strong> ⬆️ de abajo, en Safari.
+                  Tocá el botón <strong className="text-ink">Compartir</strong> ⬆️ de abajo, en Safari.
                 </li>
                 <li className="flex gap-3">
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#1B9CE3] text-xs font-bold text-white">2</span>
-                  Elegí <strong className="text-white">“Agregar a pantalla de inicio”</strong>.
+                  Elegí <strong className="text-ink">“Agregar a pantalla de inicio”</strong>.
                 </li>
               </ol>
             ) : (
-              <ol className="mt-4 space-y-3 text-sm text-white/80">
+              <ol className="mt-4 space-y-3 text-sm text-ink-soft">
                 <li className="flex gap-3">
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#1B9CE3] text-xs font-bold text-white">1</span>
-                  Tocá el menú <strong className="text-white">⋮</strong> (arriba a la derecha).
+                  Tocá el menú <strong className="text-ink">⋮</strong> (arriba a la derecha).
                 </li>
                 <li className="flex gap-3">
                   <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#1B9CE3] text-xs font-bold text-white">2</span>
-                  Elegí <strong className="text-white">“Instalar app”</strong> o “Agregar a pantalla de inicio”.
+                  Elegí <strong className="text-ink">“Instalar app”</strong> o “Agregar a pantalla de inicio”.
                 </li>
               </ol>
             )}
 
-            <p className="mt-4 text-xs text-white/50">
+            <p className="mt-4 text-xs text-ink-soft">
               Te queda como una app más: con ícono propio, pantalla completa y sin ocupar espacio.
             </p>
 

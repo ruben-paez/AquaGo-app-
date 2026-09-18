@@ -159,7 +159,7 @@ export default function RegisterForm() {
             <button
               type="submit"
               disabled={loading}
-              className="rounded-xl bg-water-700 py-3.5 font-display text-base font-bold text-white shadow-card transition hover:bg-water-800 disabled:opacity-50"
+              className="rounded-xl bg-[#F87E6D] py-3.5 font-display text-base font-bold text-white shadow-pop transition hover:bg-[#f96a55] disabled:opacity-50"
             >
               {loading ? "Creando cuenta…" : "Crear cuenta y seguir pidiendo"}
             </button>

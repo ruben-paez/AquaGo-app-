@@ -11,8 +11,14 @@ export const fetchCache = "force-no-store";
 
 export const metadata = { title: "Panel · AquaGo" };
 
-export default async function AdminPage() {
+export default async function AdminPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const user = await getSessionUser();
+  const sp = await searchParams;
+  const tabParam = typeof sp.tab === "string" ? sp.tab : undefined;
 
   if (!user || !user.isAdmin) {
     return (
@@ -42,7 +48,7 @@ export default async function AdminPage() {
     <div className="flex min-h-dvh flex-col">
       <Nav />
       <main className="mx-auto w-full max-w-6xl flex-1 px-4 py-8 sm:px-6">
-        <AdminPanel userRole={user.role} />
+        <AdminPanel userRole={user.role} initialTab={tabParam} />
       </main>
     </div>
   );

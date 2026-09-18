@@ -41,7 +41,7 @@ export default async function Nav() {
               <LogoutButton />
               <Link
                 href="/pedir"
-                className="rounded-lg bg-water-700 px-4 py-2 text-sm font-bold text-white shadow-card transition hover:bg-water-800"
+                className="rounded-lg bg-[#F87E6D] px-4 py-2 text-sm font-bold text-white shadow-card transition hover:bg-[#f96a55]"
               >
                 Pedir ahora
               </Link>
@@ -56,7 +56,7 @@ export default async function Nav() {
               </Link>
               <Link
                 href="/pedir"
-                className="rounded-lg bg-water-700 px-4 py-2 text-sm font-bold text-white shadow-card transition hover:bg-water-800"
+                className="rounded-lg bg-[#F87E6D] px-4 py-2 text-sm font-bold text-white shadow-card transition hover:bg-[#f96a55]"
               >
                 Pedir ahora
               </Link>
