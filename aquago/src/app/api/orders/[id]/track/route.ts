@@ -83,7 +83,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
       zone: order.zone,
       lat: order.lat,
       lng: order.lng,
-      driverName: order.driverName,
+      driverName: driver?.name || order.driverName,
     },
     driver,
     etaMin,

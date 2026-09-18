@@ -76,9 +76,9 @@ export default async function Home() {
   const promo = await getPromo();
 
   return (
-    <div className="flex min-h-dvh flex-col bg-white">
+    <div className="flex min-h-dvh flex-col bg-[#F2F8FC]">
       {promo.active && promo.text.trim() !== "" && (
-        <div className="bg-gradient-to-r from-[#1B9CE3] to-[#56CCF2] px-4 py-2 text-center text-xs font-bold text-white">
+        <div className="bg-gradient-to-r from-[#1B8AD6] to-[#56CCF2] px-4 py-2 text-center text-xs font-bold text-white">
           {promo.text}
         </div>
       )}
@@ -165,14 +165,14 @@ export default async function Home() {
               </p>
 
               <div className="mt-6 flex flex-wrap gap-3">
-                <div className="rounded-xl border border-ink/10 bg-[#F5F7FA] px-4 py-3 shadow-card">
+                <div className="rounded-xl border border-[#DFEBF3] bg-white px-4 py-3 shadow-card">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-ink-soft">Recarga 20 L</p>
                   <p className="font-display text-2xl font-bold text-ink">{formatGs(12000)}</p>
                   <p className="text-[11px] font-semibold text-ink-soft">
                     {formatGs(13000)} con el servicio
                   </p>
                 </div>
-                <div className="rounded-xl border border-ink/10 bg-[#F5F7FA] px-4 py-3 shadow-card">
+                <div className="rounded-xl border border-[#DFEBF3] bg-white px-4 py-3 shadow-card">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-ink-soft">Bidón completo</p>
                   <p className="font-display text-2xl font-bold text-ink">{formatGs(50000)}</p>
                   <p className="text-[11px] font-semibold text-ink-soft">
@@ -217,7 +217,7 @@ export default async function Home() {
                 <div className="absolute h-72 w-72 rounded-full bg-[#56CCF2]/10 blur-3xl" />
                 <AquaGoLogo className="h-80 opacity-[0.05]" />
               </div>
-              <div className="relative rounded-2xl border border-ink/10 bg-white p-5 shadow-pop">
+              <div className="relative rounded-2xl border border-[#DFEBF3] bg-white p-5 shadow-pop">
                 <div className="flex items-center justify-between">
                   <div>
                     <p className="text-[11px] font-bold uppercase tracking-wider text-ink-soft">Pedido</p>
@@ -312,7 +312,7 @@ export default async function Home() {
                   className={`rounded-2xl border p-6 shadow-card transition ${
                     b.comingSoon
                       ? "border-dashed border-ink/20 bg-paper"
-                      : "border-ink/10 bg-white hover:-translate-y-0.5 hover:border-water-300"
+                      : "border-[#DFEBF3] bg-white hover:-translate-y-0.5 hover:border-water-300"
                   }`}
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -390,7 +390,7 @@ export default async function Home() {
             {products.map((p, i) => (
               <div
                 key={i}
-                className="group rounded-xl border border-ink/10 bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-water-300"
+                className="group rounded-xl border border-[#DFEBF3] bg-white p-5 shadow-card transition hover:-translate-y-0.5 hover:border-water-300"
               >
                 <div className="flex items-center justify-between text-[11px] font-bold uppercase tracking-wider">
                   <span className="rounded-full bg-water-50 px-2.5 py-1 text-water-700">
@@ -443,7 +443,7 @@ export default async function Home() {
                   text: "Ves cuando lo aceptan, cuando sale y cuando llega a tu puerta.",
                 },
               ].map((s, i) => (
-                <div key={i} className="relative rounded-xl border border-ink/10 bg-white p-6 shadow-card">
+                <div key={i} className="relative rounded-xl border border-[#DFEBF3] bg-white p-6 shadow-card">
                   <span className="absolute right-5 top-4 font-display text-4xl font-bold text-water-100">
                     {i + 1}
                   </span>
@@ -461,7 +461,7 @@ export default async function Home() {
 
       {/* DESCARGÁ LA APP */}
       <section id="app" className="mx-auto max-w-6xl px-4 pb-16 sm:px-6">
-        <div className="relative overflow-hidden rounded-3xl border border-ink/10 bg-[#F5F7FA] p-8 text-center shadow-pop sm:p-12">
+        <div className="relative overflow-hidden rounded-3xl border border-[#DFEBF3] bg-white p-8 text-center shadow-pop sm:p-12">
           <div className="pointer-events-none absolute -left-20 -top-20 h-56 w-56 rounded-full bg-[#56CCF2]/10 blur-3xl" />
           <div className="pointer-events-none absolute -bottom-24 -right-16 h-56 w-56 rounded-full bg-[#1B9CE3]/10 blur-3xl" />
           <div className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#1B8AD6] text-white shadow-card">

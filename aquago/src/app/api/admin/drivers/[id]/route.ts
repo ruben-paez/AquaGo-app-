@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { eq } from "drizzle-orm";
 import { db } from "@/db";
-import { drivers } from "@/db/schema";
+import { drivers, users } from "@/db/schema";
 import { getSessionUser } from "@/lib/auth";
 
 export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }> }) {
@@ -56,5 +56,12 @@ export async function PATCH(req: Request, ctx: { params: Promise<{ id: string }>
   if (updated.length === 0) {
     return NextResponse.json({ error: "Repartidor no encontrado." }, { status: 404 });
   }
+
+  // Si le cambiaron el nombre, su cuenta (login, "Cuenta") usa el mismo
+  // nombre: todo queda consistente para el cliente y para él.
+  if (typeof patch.name === "string" && updated[0].userId) {
+    await db.update(users).set({ name: patch.name }).where(eq(users.id, updated[0].userId));
+  }
+
   return NextResponse.json({ driver: updated[0] });
 }

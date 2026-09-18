@@ -1,4 +1,4 @@
-import { and, asc, desc, eq, inArray } from "drizzle-orm";
+import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { orders, orderItems, users, products, brands, drivers } from "@/db/schema";
 
@@ -143,7 +143,10 @@ const orderSelection = {
   changeFrom: orders.changeFrom,
   transferPaid: orders.transferPaid,
   proofStatus: orders.proofStatus,
-  driverName: orders.driverName,
+  // Nombre del vendedor SIEMPRE actual: si el pedido tiene vendedor
+  // asignado, gana el nombre de su ficha (así un renombre se refleja al
+  // toque para el cliente). Si no, queda el texto escrito a mano.
+  driverName: sql<string>`coalesce(nullif(${drivers.name}, ''), ${orders.driverName})`,
   driverId: orders.driverId,
   driverPhone: drivers.phone,
   driverVehicle: drivers.vehicle,
