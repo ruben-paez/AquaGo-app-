@@ -142,25 +142,6 @@ export default async function Home() {
           </div>
         </div>
 
-        {/* Navegación móvil */}
-        <nav className="flex items-center justify-center gap-1 border-t border-white/10 px-2 pb-1.5 pt-1 md:hidden">
-          <Link href="/" className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-soft transition hover:bg-water-50 hover:text-ink">
-            Inicio
-          </Link>
-          <Link href="/pedir" className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-soft transition hover:bg-water-50 hover:text-ink">
-            Pedir
-          </Link>
-          {user && (
-            <Link href="/mis-pedidos" className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-soft transition hover:bg-water-50 hover:text-ink">
-              Mis pedidos
-            </Link>
-          )}
-          {user?.isAdmin && (
-            <Link href="/admin" className="rounded-lg px-2.5 py-1.5 text-xs font-semibold text-ink-soft transition hover:bg-water-50 hover:text-ink">
-              Panel
-            </Link>
-          )}
-        </nav>
       </header>
 
       <main className="flex-1">
@@ -187,14 +168,14 @@ export default async function Home() {
                 <div className="rounded-xl border border-ink/10 bg-[#F5F7FA] px-4 py-3 shadow-card">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-ink-soft">Recarga 20 L</p>
                   <p className="font-display text-2xl font-bold text-ink">{formatGs(12000)}</p>
-                  <p className="text-[11px] font-semibold text-white/50">
+                  <p className="text-[11px] font-semibold text-ink-soft">
                     {formatGs(13000)} con el servicio
                   </p>
                 </div>
                 <div className="rounded-xl border border-ink/10 bg-[#F5F7FA] px-4 py-3 shadow-card">
                   <p className="text-[11px] font-bold uppercase tracking-wider text-ink-soft">Bidón completo</p>
                   <p className="font-display text-2xl font-bold text-ink">{formatGs(50000)}</p>
-                  <p className="text-[11px] font-semibold text-white/50">
+                  <p className="text-[11px] font-semibold text-ink-soft">
                     {formatGs(55000)} con el servicio
                   </p>
                 </div>
@@ -253,7 +234,7 @@ export default async function Home() {
                     <AquaNatMark className="h-6 w-6" />
                   </span>
                   <span className="text-sm font-bold text-ink">AQUAnat</span>
-                  <span className="text-xs font-semibold text-white/50">Puramente Encarnacena</span>
+                  <span className="text-xs font-semibold text-ink-soft">Puramente Encarnacena</span>
                 </div>
 
                 <div className="mt-4 flex gap-4">
@@ -303,7 +284,7 @@ export default async function Home() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className="text-xs font-semibold text-white/50">Total</p>
+                    <p className="text-xs font-semibold text-ink-soft">Total</p>
                     <p className="font-display text-lg font-bold text-[#56CCF2]">{formatGs(26500)}</p>
                   </div>
                 </div>
@@ -339,8 +320,8 @@ export default async function Home() {
                       <AquaNatLogo className="h-14" />
                     ) : (
                       <div>
-                        <p className="font-display text-xl font-bold text-white/80">{b.name}</p>
-                        <p className="text-sm text-white/50">{b.tagline}</p>
+                        <p className="font-display text-xl font-bold text-ink-soft">{b.name}</p>
+                        <p className="text-sm text-ink-soft">{b.tagline}</p>
                       </div>
                     )}
                     {b.comingSoon ? (
@@ -358,7 +339,7 @@ export default async function Home() {
 
                   {!b.comingSoon && (
                     <>
-                      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-white/60">
+                      <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm font-semibold text-ink-soft">
                         <span className="flex items-center gap-1.5">
                           <IconClock className="h-4 w-4 text-water-600" />
                           {b.etaMin}–{b.etaMax} min
@@ -420,7 +401,7 @@ export default async function Home() {
                   )}
                 </div>
                 <h3 className="mt-3 font-display text-base font-bold text-ink">{p.name}</h3>
-                <p className="mt-1.5 min-h-10 text-sm leading-relaxed text-white/60">{p.description}</p>
+                <p className="mt-1.5 min-h-10 text-sm leading-relaxed text-ink-soft">{p.description}</p>
                 <div className="mt-3 flex items-center justify-between">
                   <span className="font-display text-xl font-bold text-ink">{formatGs(p.price)}</span>
                   {p.category !== "agua" && (
@@ -470,7 +451,7 @@ export default async function Home() {
                     {s.icon}
                   </span>
                   <h3 className="mt-4 font-display text-lg font-bold text-ink">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">{s.text}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-soft">{s.text}</p>
                 </div>
               ))}
             </div>
