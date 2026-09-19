@@ -1,0 +1,32 @@
+AQUAGO - Marca intensa (variante 6) + paneles arreglados
+=========================================================
+
+QUE TRAE (22 archivos):
+1) PORTADA - Variante 6 "Marca intensa":
+   - Hero navy solido #0F2A52 con gota gigante de marca (marca de agua)
+     y ondas cian al pie que se funden con el fondo.
+   - Fondo de toda la portada: #EAF6FF (un pelo mas celeste que antes).
+   - Tarjetas de precio y boton "Ver marcas" en cristal (blanco translucido).
+   - Tarjetas blancas con borde celeste #C9E6FA en toda la portada.
+   - Arreglos: codigo de pedido AQG que salia blanco sobre blanco,
+     punto verde ilegible, resto del diseno oscuro eliminado.
+   - CTAs coral intactos. Barra inferior intacta.
+
+2) PANELES - Solo la barra inferior en el celular:
+   - La fila de pestanas deslizable de arriba DESAPARECE en el celular
+     (se navega con la barra de abajo: Pedidos/Reparto/Clientes/Marcas/Ajustes).
+   - En escritorio la fila de arriba SE MANTIENE como complemento.
+
+3) EMOJIS FUERA DE TODA LA APP (regla: solo iconos SVG propios):
+   - Panel plataforma/marca/repartidor, wizard, instalacion, avisos,
+     mapa (los pines ahora usan iconos de linea blancos), ayuda y chat.
+   - 12 iconos nuevos en icons.tsx (estrella, lapiz, tacho, refrescar,
+     prohibido, alerta, recibo, chat, foco, clip, campana, tienda).
+
+COMO SUBIRLO (GitHub web, igual que siempre):
+1. Descargá este zip y extraelo.
+2. Entrá a github.com/ruben-paez/AquaGo-app- (rama main).
+3. "Add file" > "Upload files".
+4. Arrastrá SOLO la carpeta "aquago" completa (pisa las existentes).
+5. Commit changes: "Marca intensa + paneles sin slider + cero emojis".
+6. Esperá el deploy de Vercel (2-3 min) y mirá www.aquago.company.
